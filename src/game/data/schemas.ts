@@ -7,6 +7,7 @@ export const formSchema = z.object({
   cardType: z.enum(["Spell", "Summon", "Seal", "Relic"]),
   cost: z.number().int().min(0),
   compatibility: z.enum(["Instant", "Ongoing", "Both"]),
+  targetAlighnment: z.enum(["Friendly", "Opposing", "Both"]),
   trigger: z.string(),
   triggerText: z.string(),
   impliedSubject: z.string(),

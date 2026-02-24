@@ -10,7 +10,7 @@ const rawMaterials: MaterialComponent[] = [
     cost: 1,
     compatibility: "Instant",
     resultText: "Deal 1 damage. Deal 1 damage at the start of your next turn.",
-    effect: { type: "Burn", friendlyFire: false, amount: 1, durationSteps: 2 },
+    effect: { type: "Burn", amount: 1, durationSteps: 2 },
   },
   {
     id: "material-granitite",
@@ -20,7 +20,7 @@ const rawMaterials: MaterialComponent[] = [
     cost: 1,
     compatibility: "Ongoing",
     resultText: "Gain 1 Armor.",
-    effect: { type: "Armor", friendlyFire: false, target: "Summon", amount: 1 },
+    effect: { type: "Armor", target: "Summon", amount: 1 },
   },
   {
     id: "material-swiftvine",
@@ -32,7 +32,6 @@ const rawMaterials: MaterialComponent[] = [
     resultText: "Recover 3.",
     effect: {
       type: "Recover",
-      friendlyFire: false,
       target: "Summon",
       amount: 3,
     },
@@ -47,7 +46,6 @@ const rawMaterials: MaterialComponent[] = [
     resultText: "Move 1.",
     effect: {
       type: "Move",
-      friendlyFire: false,
       target: "SummonOrSeal",
       amount: 1,
     },
@@ -59,10 +57,9 @@ const rawMaterials: MaterialComponent[] = [
     path: "Shade",
     cost: 1,
     compatibility: "Ongoing",
-    resultText: "Gain Brittle 1.",
+    resultText: "Brittle 1.",
     effect: {
       type: "Brittle",
-      friendlyFire: false,
       target: "Summon",
       amount: 1,
     },
@@ -74,19 +71,17 @@ const rawMaterials: MaterialComponent[] = [
     path: "Dawn",
     cost: 1,
     compatibility: "Instant",
-    resultText: "",
+    resultText: "Recover 1. Cleanse 1.",
     effect: {
       type: "Composite",
       effects: [
         {
           type: "Recover",
-          friendlyFire: false,
           target: "Summon",
           amount: 1,
         },
         {
           type: "Cleanse",
-          friendlyFire: false,
           target: "Summon",
           amount: 0,
         },
