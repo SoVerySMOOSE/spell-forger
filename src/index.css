@@ -14,10 +14,7 @@
   --badge-seal: #3e5b90;
   --danger: #983a3a;
 
-  font-family:
-    "IBM Plex Sans",
-    "Segoe UI",
-    sans-serif;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
   line-height: 1.35;
   font-weight: 450;
   color: var(--ink);
@@ -41,10 +38,7 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-family:
-    "Space Grotesk",
-    "Trebuchet MS",
-    sans-serif;
+  font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
   letter-spacing: 0.02em;
 }
 

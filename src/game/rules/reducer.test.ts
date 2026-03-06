@@ -5,7 +5,10 @@ import type { PlayerId } from "../model/keywords";
 import { refillForgeGrid } from "./forge";
 import { reduce } from "./reducer";
 
-const withWorkContext = (state: GameState, activePlayer: PlayerId): GameState => {
+const withWorkContext = (
+  state: GameState,
+  activePlayer: PlayerId,
+): GameState => {
   return {
     ...state,
     phase: "work",
@@ -27,7 +30,17 @@ const finishTurn = (state: GameState): GameState => {
 
 describe("forge refill", () => {
   it("fills empty slots in reading order", () => {
-    const grid = [null, "occupied-a", null, null, "occupied-b", null, null, null, "occupied-c"];
+    const grid = [
+      null,
+      "occupied-a",
+      null,
+      null,
+      "occupied-b",
+      null,
+      null,
+      null,
+      "occupied-c",
+    ];
     const deck = ["one", "two", "three", "four"];
 
     const result = refillForgeGrid(grid, deck);
@@ -53,7 +66,17 @@ describe("response resolution", () => {
     state = withWorkContext(
       {
         ...state,
-        forgeGrid: ["starflare-equation", null, null, null, null, null, null, null, null],
+        forgeGrid: [
+          "starflare-equation",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
         inPlay: [
           {
             instanceId: "seal-1",
@@ -83,7 +106,9 @@ describe("response resolution", () => {
     expect(state.phase).toBe("work");
     expect(state.cores[0].aether).toBe(0);
     expect(state.spent).toEqual(expect.arrayContaining(["starflare-equation"]));
-    expect(state.inPlay.some((spell) => spell.spellId === "starflare-equation")).toBe(false);
+    expect(
+      state.inPlay.some((spell) => spell.spellId === "starflare-equation"),
+    ).toBe(false);
   });
 
   it("jammed Incantation does not resolve until unjammed during Maintenance", () => {
@@ -91,7 +116,17 @@ describe("response resolution", () => {
     state = withWorkContext(
       {
         ...state,
-        forgeGrid: ["starflare-equation", null, null, null, null, null, null, null, null],
+        forgeGrid: [
+          "starflare-equation",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
         inPlay: [
           {
             instanceId: "seal-2",
@@ -116,7 +151,9 @@ describe("response resolution", () => {
     });
     state = reduce(state, { type: "ResolveResponse" });
 
-    const jammed = state.inPlay.find((spell) => spell.spellId === "starflare-equation");
+    const jammed = state.inPlay.find(
+      (spell) => spell.spellId === "starflare-equation",
+    );
     expect(jammed).toBeDefined();
     expect(jammed?.jamCounters).toBe(1);
     expect(state.cores[0].aether).toBe(0);
@@ -131,7 +168,9 @@ describe("response resolution", () => {
       instanceIds: jammed ? [jammed.instanceId] : [],
     });
 
-    expect(state.inPlay.some((spell) => spell.spellId === "starflare-equation")).toBe(false);
+    expect(
+      state.inPlay.some((spell) => spell.spellId === "starflare-equation"),
+    ).toBe(false);
     expect(state.spent).toEqual(expect.arrayContaining(["starflare-equation"]));
     expect(state.cores[0].aether).toBe(4);
     expect(state.cores[0].stress).toBe(2);
@@ -144,7 +183,17 @@ describe("scry lifecycle", () => {
     state = withWorkContext(
       {
         ...state,
-        forgeGrid: ["prismatic-scry", null, null, null, null, null, null, null, null],
+        forgeGrid: [
+          "prismatic-scry",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
         forgeDeck: ["pulse-siphon", "copper-bastion", "vent-warden"],
       },
       0,
@@ -158,7 +207,10 @@ describe("scry lifecycle", () => {
     });
     state = reduce(state, { type: "ResolveResponse" });
 
-    expect(state.scryReveals.player0).toEqual(["pulse-siphon", "copper-bastion"]);
+    expect(state.scryReveals.player0).toEqual([
+      "pulse-siphon",
+      "copper-bastion",
+    ]);
 
     state = reduce(state, { type: "AdvancePhase" });
     state = reduce(state, {
@@ -199,4 +251,3 @@ describe("cycle timing", () => {
     expect(state.activePlayer).toBe(0);
   });
 });
-

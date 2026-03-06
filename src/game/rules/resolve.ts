@@ -130,7 +130,9 @@ const resolveSpellTargetInstanceId = (
       if (typeof chosen !== "string") {
         return null;
       }
-      return state.inPlay.some((spell) => spell.instanceId === chosen) ? chosen : null;
+      return state.inPlay.some((spell) => spell.instanceId === chosen)
+        ? chosen
+        : null;
     }
     case "chosenArmedSeal": {
       const chosen = resolveChosenTarget(choices, effectIndex);
@@ -151,7 +153,10 @@ const resolveSpellTargetInstanceId = (
 const updateCore = (
   state: GameState,
   player: PlayerId,
-  updater: (aether: number, stress: number) => { aether: number; stress: number },
+  updater: (
+    aether: number,
+    stress: number,
+  ) => { aether: number; stress: number },
 ): GameState => {
   const current = state.cores[player];
   const nextCore = updater(current.aether, current.stress);
@@ -226,8 +231,18 @@ export const applyEffects = (
         return;
       }
       case "Leech": {
-        const from = resolveCoreTargetPlayer(effect.from, context, effectIndex, choices);
-        const to = resolveCoreTargetPlayer(effect.to, context, effectIndex, choices);
+        const from = resolveCoreTargetPlayer(
+          effect.from,
+          context,
+          effectIndex,
+          choices,
+        );
+        const to = resolveCoreTargetPlayer(
+          effect.to,
+          context,
+          effectIndex,
+          choices,
+        );
         if (from === null || to === null) {
           return;
         }
@@ -270,7 +285,10 @@ export const applyEffects = (
         if (!targetId) {
           return;
         }
-        next = { ...next, inPlay: addJamCounters(next.inPlay, targetId, effect.counters) };
+        next = {
+          ...next,
+          inPlay: addJamCounters(next.inPlay, targetId, effect.counters),
+        };
         return;
       }
       case "Scry": {
@@ -312,7 +330,9 @@ export const resolveAnnouncedSpellInstance = (
   spellBook: Record<string, SpellDefinition>,
   targets: TargetChoice[] = [],
 ): GameState => {
-  const spellInPlay = state.inPlay.find((entry) => entry.instanceId === instanceId);
+  const spellInPlay = state.inPlay.find(
+    (entry) => entry.instanceId === instanceId,
+  );
   if (!spellInPlay) {
     return addLog(
       state,
@@ -320,7 +340,10 @@ export const resolveAnnouncedSpellInstance = (
     );
   }
 
-  let next = setInPlaySpell(state, instanceId, (spell) => ({ ...spell, status: "inPlay" }));
+  let next = setInPlaySpell(state, instanceId, (spell) => ({
+    ...spell,
+    status: "inPlay",
+  }));
   const spell = spellBook[spellInPlay.spellId];
   const context: EffectResolutionContext = {
     sourceController: spellInPlay.controller,
@@ -343,7 +366,11 @@ export const resolveAnnouncedSpellInstance = (
 
   if (spellInPlay.type === "Incantation") {
     next = dispelInstance(next, instanceId, spellInPlay.controller);
-    return addLog(next, `${spell.name} resolves and is sent to Spent.`, spellInPlay.controller);
+    return addLog(
+      next,
+      `${spell.name} resolves and is sent to Spent.`,
+      spellInPlay.controller,
+    );
   }
 
   if (spellInPlay.type === "Seal") {
@@ -352,7 +379,11 @@ export const resolveAnnouncedSpellInstance = (
       status: "inPlay",
       armed: true,
     }));
-    return addLog(next, `${spell.name} enters play Armed.`, spellInPlay.controller);
+    return addLog(
+      next,
+      `${spell.name} enters play Armed.`,
+      spellInPlay.controller,
+    );
   }
 
   return addLog(next, `${spell.name} enters play.`, spellInPlay.controller);

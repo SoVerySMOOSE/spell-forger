@@ -26,7 +26,10 @@ export const triggerMatchesAnnouncement = (
 
 export const startWorkForActivePlayer = (state: GameState): GameState => {
   const nextPower: [number, number] = [...state.power] as [number, number];
-  const nextPowerLimit: [number, number] = [...state.powerLimit] as [number, number];
+  const nextPowerLimit: [number, number] = [...state.powerLimit] as [
+    number,
+    number,
+  ];
   nextPower[state.activePlayer] = 0;
   nextPowerLimit[state.activePlayer] = state.cycleNumber;
 

@@ -53,7 +53,9 @@ export interface GameBoardProps {
 export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
   const [seedInput, setSeedInput] = useState(() => String(state.seed));
   const [pendingCast, setPendingCast] = useState<PendingCast | null>(null);
-  const [unjamSelection, setUnjamSelection] = useState<Record<string, boolean>>({});
+  const [unjamSelection, setUnjamSelection] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const actingPlayer: PlayerId | null = useMemo(() => {
     if (state.phase === "work") {
@@ -78,7 +80,11 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
     [state],
   );
 
-  const openCastFlow = (player: PlayerId, source: SpellSource, spellId: string) => {
+  const openCastFlow = (
+    player: PlayerId,
+    source: SpellSource,
+    spellId: string,
+  ) => {
     const spell = getSpellDefinition(spellId);
     const requirements = getResolveTargetRequirements(spell);
     if (requirements.length === 0) {
@@ -104,10 +110,12 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
       return;
     }
 
-    const targets: TargetChoice[] = pendingCast.requirements.map((requirement) => ({
-      effectIndex: requirement.effectIndex,
-      value: pendingCast.selections[requirement.effectIndex],
-    }));
+    const targets: TargetChoice[] = pendingCast.requirements.map(
+      (requirement) => ({
+        effectIndex: requirement.effectIndex,
+        value: pendingCast.selections[requirement.effectIndex],
+      }),
+    );
 
     if (targets.some((target) => target.value === undefined)) {
       return;
@@ -194,7 +202,11 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                 <span>Cycle: {state.cycleNumber}</span>
               </div>
               <div className="status-row">
-                {state.activePlayer === player ? <strong>Active Turn</strong> : <span>Waiting</span>}
+                {state.activePlayer === player ? (
+                  <strong>Active Turn</strong>
+                ) : (
+                  <span>Waiting</span>
+                )}
                 {state.phase === "gameOver" && state.winner === player ? (
                   <strong>Winner</strong>
                 ) : null}
@@ -216,14 +228,18 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
             >
               Draw Power
             </button>
-            <button onClick={() => dispatch({ type: "AdvancePhase" })}>End Work</button>
+            <button onClick={() => dispatch({ type: "AdvancePhase" })}>
+              End Work
+            </button>
           </div>
         )}
         {state.phase === "response" && state.pendingAnnouncement && (
           <div className="response-panel">
             <p>
               Announced:{" "}
-              <strong>{getSpellDefinition(state.pendingAnnouncement.spellId).name}</strong>{" "}
+              <strong>
+                {getSpellDefinition(state.pendingAnnouncement.spellId).name}
+              </strong>{" "}
               by {getPlayerLabel(state.pendingAnnouncement.controller)}
             </p>
             <p>
@@ -235,8 +251,8 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                 : "None"}
             </p>
             <p>
-              {getPlayerLabel(otherPlayer(state.activePlayer))} may play Response spells from
-              Forge/Scry, then resolve.
+              {getPlayerLabel(otherPlayer(state.activePlayer))} may play
+              Response spells from Forge/Scry, then resolve.
             </p>
             <button onClick={() => dispatch({ type: "ResolveResponse" })}>
               Resolve Response
@@ -264,7 +280,8 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                         }))
                       }
                     />
-                    {getSpellDefinition(spell.spellId).name} ({spell.jamCounters} jam)
+                    {getSpellDefinition(spell.spellId).name} (
+                    {spell.jamCounters} jam)
                   </label>
                 ))}
               </div>
@@ -287,12 +304,16 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
             }
 
             const spell = getSpellDefinition(spellId);
-            const canPlay = actingPlayer !== null && canPlayFromForgeSlot(state, actingPlayer, slotIndex);
+            const canPlay =
+              actingPlayer !== null &&
+              canPlayFromForgeSlot(state, actingPlayer, slotIndex);
 
             return (
               <article key={slotIndex} className="forge-slot">
                 <div className="spell-top">
-                  <span className={typeBadgeClass(spell.type)}>{spell.type}</span>
+                  <span className={typeBadgeClass(spell.type)}>
+                    {spell.type}
+                  </span>
                   <span>Cost {spell.costPower}</span>
                 </div>
                 <h3>{spell.name}</h3>
@@ -305,7 +326,11 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                   disabled={!canPlay || actingPlayer === null}
                   onClick={() =>
                     actingPlayer !== null &&
-                    openCastFlow(actingPlayer, { zone: "forge", slotIndex }, spell.id)
+                    openCastFlow(
+                      actingPlayer,
+                      { zone: "forge", slotIndex },
+                      spell.id,
+                    )
                   }
                 >
                   {PLAY_VERB_BY_TYPE[spell.type]}
@@ -331,16 +356,28 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                 <div className="reveal-list">
                   {reveals.map((spellId, revealIndex) => {
                     const spell = getSpellDefinition(spellId);
-                    const canPlay = canPlayFromScryReveal(state, player, revealIndex);
+                    const canPlay = canPlayFromScryReveal(
+                      state,
+                      player,
+                      revealIndex,
+                    );
                     return (
-                      <div key={`${spellId}-${revealIndex}`} className="reveal-card">
+                      <div
+                        key={`${spellId}-${revealIndex}`}
+                        className="reveal-card"
+                      >
                         <div>
-                          <strong>{spell.name}</strong> ({spell.type}, Cost {spell.costPower})
+                          <strong>{spell.name}</strong> ({spell.type}, Cost{" "}
+                          {spell.costPower})
                         </div>
                         <button
                           disabled={!canPlay}
                           onClick={() =>
-                            openCastFlow(player, { zone: "scry", revealIndex }, spell.id)
+                            openCastFlow(
+                              player,
+                              { zone: "scry", revealIndex },
+                              spell.id,
+                            )
                           }
                         >
                           {PLAY_VERB_BY_TYPE[spell.type]}
@@ -370,7 +407,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                     return (
                       <div key={spell.instanceId} className="in-play-card">
                         <strong>{card.name}</strong>
-                        <span className={typeBadgeClass(card.type)}>{card.type}</span>
+                        <span className={typeBadgeClass(card.type)}>
+                          {card.type}
+                        </span>
                         <span>Status: {spell.status}</span>
                         <span>Jam: {spell.jamCounters}</span>
                         {spell.type === "Seal" ? (
@@ -393,7 +432,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
             <summary>Show cards</summary>
             <ul className="plain-list">
               {state.spent.map((spellId, index) => (
-                <li key={`${spellId}-${index}`}>{getSpellDefinition(spellId).name}</li>
+                <li key={`${spellId}-${index}`}>
+                  {getSpellDefinition(spellId).name}
+                </li>
               ))}
             </ul>
           </details>
@@ -415,8 +456,8 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
         <section className="panel cast-panel">
           <h2>Select Targets</h2>
           <p>
-            {getSpellDefinition(pendingCast.spellId).name} requires target selection before
-            announcement.
+            {getSpellDefinition(pendingCast.spellId).name} requires target
+            selection before announcement.
           </p>
           <div className="target-list">
             {pendingCast.requirements.map((requirement) => {
@@ -450,7 +491,8 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                       <option value="">Select a spell</option>
                       {state.inPlay.map((spell) => (
                         <option key={spell.instanceId} value={spell.instanceId}>
-                          {getSpellDefinition(spell.spellId).name} ({spell.instanceId})
+                          {getSpellDefinition(spell.spellId).name} (
+                          {spell.instanceId})
                         </option>
                       ))}
                     </select>
@@ -489,7 +531,8 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                       <option value="">Select a seal</option>
                       {armedSeals.map((spell) => (
                         <option key={spell.instanceId} value={spell.instanceId}>
-                          {getSpellDefinition(spell.spellId).name} ({spell.instanceId})
+                          {getSpellDefinition(spell.spellId).name} (
+                          {spell.instanceId})
                         </option>
                       ))}
                     </select>
@@ -501,7 +544,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                 <label key={requirement.effectIndex}>
                   Target core
                   <select
-                    value={String(pendingCast.selections[requirement.effectIndex] ?? "")}
+                    value={String(
+                      pendingCast.selections[requirement.effectIndex] ?? "",
+                    )}
                     onChange={(event) =>
                       setPendingCast((prev) =>
                         prev
@@ -509,7 +554,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                               ...prev,
                               selections: {
                                 ...prev.selections,
-                                [requirement.effectIndex]: Number(event.target.value) as PlayerId,
+                                [requirement.effectIndex]: Number(
+                                  event.target.value,
+                                ) as PlayerId,
                               },
                             }
                           : prev,

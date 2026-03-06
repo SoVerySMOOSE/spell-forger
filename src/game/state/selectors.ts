@@ -29,7 +29,10 @@ const canUsePlayWindow = (
   playWindow: "Work" | "Response" | "Any",
 ): boolean => {
   if (state.phase === "work") {
-    return player === state.activePlayer && (playWindow === "Work" || playWindow === "Any");
+    return (
+      player === state.activePlayer &&
+      (playWindow === "Work" || playWindow === "Any")
+    );
   }
   if (state.phase === "response") {
     return (
@@ -98,7 +101,8 @@ export const getResolveTargetRequirements = (
     for (const effect of ability.effects) {
       if (
         (effect.type === "Dispel" || effect.type === "Jam") &&
-        (effect.target.kind === "chosenInPlaySpell" || effect.target.kind === "chosenArmedSeal")
+        (effect.target.kind === "chosenInPlaySpell" ||
+          effect.target.kind === "chosenArmedSeal")
       ) {
         requirements.push({ effectIndex, effect });
       }
@@ -109,7 +113,8 @@ export const getResolveTargetRequirements = (
           effect.type === "Leech") &&
         ((effect.type !== "Leech" && effect.target.kind === "chosenCore") ||
           (effect.type === "Leech" &&
-            (effect.from.kind === "chosenCore" || effect.to.kind === "chosenCore")))
+            (effect.from.kind === "chosenCore" ||
+              effect.to.kind === "chosenCore")))
       ) {
         requirements.push({ effectIndex, effect });
       }
@@ -120,13 +125,18 @@ export const getResolveTargetRequirements = (
   return requirements;
 };
 
-export const getTriggeredSealsForPending = (state: GameState): InPlaySpell[] => {
+export const getTriggeredSealsForPending = (
+  state: GameState,
+): InPlaySpell[] => {
   const pending = state.pendingAnnouncement;
   if (!pending) {
     return [];
   }
   const announced = ALL_SPELLS_BY_ID[pending.spellId];
-  const order: PlayerId[] = [otherPlayer(state.activePlayer), state.activePlayer];
+  const order: PlayerId[] = [
+    otherPlayer(state.activePlayer),
+    state.activePlayer,
+  ];
   const results: InPlaySpell[] = [];
 
   for (const controller of order) {
@@ -160,6 +170,9 @@ export const getTriggeredSealsForPending = (state: GameState): InPlaySpell[] => 
   return results;
 };
 
-export const getLastEvents = (state: GameState, count: number): GameState["log"] => {
+export const getLastEvents = (
+  state: GameState,
+  count: number,
+): GameState["log"] => {
   return state.log.slice(Math.max(0, state.log.length - count));
 };

@@ -13,6 +13,9 @@ export const makeRandomSeed = (): number => {
 export const useGameStore = (
   initialSeed: number = defaultSeed,
 ): [GameState, Dispatch<GameAction>] => {
-  const initialState = useMemo(() => createNewGameState(initialSeed), [initialSeed]);
+  const initialState = useMemo(
+    () => createNewGameState(initialSeed),
+    [initialSeed],
+  );
   return useReducer(reduce, initialState);
 };
