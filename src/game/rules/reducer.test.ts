@@ -4,6 +4,7 @@ import type { GameState } from "../model/gameState";
 import type { PlayerId } from "../model/keywords";
 import { refillForgeGrid } from "./forge";
 import { reduce } from "./reducer";
+import { canPlayFromForgeSlot } from "../state/selectors";
 
 const withWorkContext = (
   state: GameState,
@@ -20,10 +21,11 @@ const withWorkContext = (
 };
 
 const finishTurn = (state: GameState): GameState => {
+  const currentActive = state.activePlayer;
   const afterWork = reduce(state, { type: "AdvancePhase" });
   return reduce(afterWork, {
     type: "ChooseUnjam",
-    player: state.activePlayer,
+    player: currentActive,
     instanceIds: [],
   });
 };
@@ -67,7 +69,7 @@ describe("response resolution", () => {
       {
         ...state,
         forgeGrid: [
-          "starflare-equation",
+          "hasta-stellarum",
           null,
           null,
           null,
@@ -80,7 +82,8 @@ describe("response resolution", () => {
         inPlay: [
           {
             instanceId: "seal-1",
-            spellId: "mute-lattice",
+            cardId: "os-cera-clausum",
+            spellId: "os-cera-clausum",
             controller: 1,
             type: "Seal",
             armed: true,
@@ -97,7 +100,7 @@ describe("response resolution", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "starflare-equation",
+      spellId: "hasta-stellarum",
     });
     expect(state.phase).toBe("response");
 
@@ -105,9 +108,9 @@ describe("response resolution", () => {
 
     expect(state.phase).toBe("work");
     expect(state.cores[0].aether).toBe(0);
-    expect(state.spent).toEqual(expect.arrayContaining(["starflare-equation"]));
+    expect(state.spent).toEqual(expect.arrayContaining(["hasta-stellarum"]));
     expect(
-      state.inPlay.some((spell) => spell.spellId === "starflare-equation"),
+      state.inPlay.some((spell) => spell.spellId === "hasta-stellarum"),
     ).toBe(false);
   });
 
@@ -117,7 +120,7 @@ describe("response resolution", () => {
       {
         ...state,
         forgeGrid: [
-          "starflare-equation",
+          "hasta-stellarum",
           null,
           null,
           null,
@@ -130,7 +133,8 @@ describe("response resolution", () => {
         inPlay: [
           {
             instanceId: "seal-2",
-            spellId: "snare-coil",
+            cardId: "clepsydra-fissa",
+            spellId: "clepsydra-fissa",
             controller: 1,
             type: "Seal",
             armed: true,
@@ -147,12 +151,12 @@ describe("response resolution", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "starflare-equation",
+      spellId: "hasta-stellarum",
     });
     state = reduce(state, { type: "ResolveResponse" });
 
     const jammed = state.inPlay.find(
-      (spell) => spell.spellId === "starflare-equation",
+      (spell) => spell.spellId === "hasta-stellarum",
     );
     expect(jammed).toBeDefined();
     expect(jammed?.jamCounters).toBe(1);
@@ -169,22 +173,22 @@ describe("response resolution", () => {
     });
 
     expect(
-      state.inPlay.some((spell) => spell.spellId === "starflare-equation"),
+      state.inPlay.some((spell) => spell.spellId === "hasta-stellarum"),
     ).toBe(false);
-    expect(state.spent).toEqual(expect.arrayContaining(["starflare-equation"]));
+    expect(state.spent).toEqual(expect.arrayContaining(["hasta-stellarum"]));
     expect(state.cores[0].aether).toBe(4);
     expect(state.cores[0].stress).toBe(2);
   });
 });
 
-describe("scry lifecycle", () => {
-  it("reveals are playable only this turn and are discarded during maintenance cleanup", () => {
+describe("reserve lifecycle", () => {
+  it("Scry puts cards in Reserve and they persist across turns", () => {
     let state = createNewGameState(33);
     state = withWorkContext(
       {
         ...state,
         forgeGrid: [
-          "prismatic-scry",
+          "corona-scintillarum",
           null,
           null,
           null,
@@ -194,7 +198,7 @@ describe("scry lifecycle", () => {
           null,
           null,
         ],
-        forgeDeck: ["pulse-siphon", "copper-bastion", "vent-warden"],
+        forgeDeck: ["siphon-aetheris", "lemur-cineris", "turris-runarum"],
       },
       0,
     );
@@ -203,32 +207,85 @@ describe("scry lifecycle", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "prismatic-scry",
+      spellId: "corona-scintillarum",
     });
     state = reduce(state, { type: "ResolveResponse" });
 
-    expect(state.scryReveals.player0).toEqual([
-      "pulse-siphon",
-      "copper-bastion",
-    ]);
+    expect(state.reserve.player0).toEqual(["siphon-aetheris", "lemur-cineris"]);
 
-    state = reduce(state, { type: "AdvancePhase" });
-    state = reduce(state, {
-      type: "ChooseUnjam",
-      player: 0,
-      instanceIds: [],
+    state = finishTurn(state);
+    expect(state.activePlayer).toBe(1);
+    expect(state.reserve.player0).toEqual(["siphon-aetheris", "lemur-cineris"]);
+
+    const invalid = reduce(state, {
+      type: "AnnounceSpell",
+      player: 1,
+      source: { zone: "reserve", reserveIndex: 0 },
+      spellId: "siphon-aetheris",
     });
+    expect(invalid).toEqual(state);
+  });
+});
 
-    expect(state.scryReveals.player0).toEqual([]);
-    expect(state.spent).toEqual(
-      expect.arrayContaining(["pulse-siphon", "copper-bastion"]),
+describe("objectives", () => {
+  it("wins by Saturation only at the start of that player's turn", () => {
+    let state = createNewGameState(44);
+    state = {
+      ...state,
+      cores: [
+        { aether: 0, stress: 0 },
+        { aether: 10, stress: 0 },
+      ],
+    };
+
+    state = finishTurn(state);
+
+    expect(state.phase).toBe("gameOver");
+    expect(state.winner).toBe(1);
+    expect(state.loser).toBe(0);
+  });
+
+  it("loses immediately when Stress reaches 10", () => {
+    let state = createNewGameState(55);
+    state = withWorkContext(
+      {
+        ...state,
+        cores: [
+          { aether: 0, stress: 9 },
+          { aether: 0, stress: 0 },
+        ],
+        forgeGrid: [
+          "hasta-stellarum",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
+      },
+      0,
     );
+
+    state = reduce(state, {
+      type: "AnnounceSpell",
+      player: 0,
+      source: { zone: "forge", slotIndex: 0 },
+      spellId: "hasta-stellarum",
+    });
+    state = reduce(state, { type: "ResolveResponse" });
+
+    expect(state.phase).toBe("gameOver");
+    expect(state.winner).toBe(1);
+    expect(state.loser).toBe(0);
   });
 });
 
 describe("cycle timing", () => {
   it("increments cycle after both players act and alternates first player each cycle", () => {
-    let state = createNewGameState(44);
+    let state = createNewGameState(66);
     state = withWorkContext(state, 0);
 
     expect(state.cycleNumber).toBe(1);
@@ -249,5 +306,228 @@ describe("cycle timing", () => {
     state = finishTurn(state);
     expect(state.cycleNumber).toBe(3);
     expect(state.activePlayer).toBe(0);
+  });
+});
+
+describe("advanced cards", () => {
+  it("supports activated once-per-work summons", () => {
+    let state = createNewGameState(77);
+    state = withWorkContext(
+      {
+        ...state,
+        inPlay: [
+          {
+            instanceId: "lemur-1",
+            cardId: "lemur-cineris",
+            spellId: "lemur-cineris",
+            controller: 0,
+            type: "Summon",
+            jamCounters: 0,
+            status: "inPlay",
+          },
+          {
+            instanceId: "oracle-1",
+            cardId: "oraculum-specilli",
+            spellId: "oraculum-specilli",
+            controller: 0,
+            type: "Summon",
+            jamCounters: 0,
+            status: "inPlay",
+          },
+        ],
+        forgeDeck: ["schema-supercursus", "canticum-exhalationis"],
+      },
+      0,
+    );
+
+    state = reduce(state, {
+      type: "ActivateSpellAbility",
+      player: 0,
+      instanceId: "lemur-1",
+    });
+    expect(state.cores[0].aether).toBe(1);
+    expect(state.cores[0].stress).toBe(1);
+
+    state = reduce(state, {
+      type: "ActivateSpellAbility",
+      player: 0,
+      instanceId: "lemur-1",
+    });
+    expect(state.cores[0].aether).toBe(1);
+    expect(state.cores[0].stress).toBe(1);
+
+    state = reduce(state, {
+      type: "ActivateSpellAbility",
+      player: 0,
+      instanceId: "oracle-1",
+    });
+    expect(state.reserve.player0).toEqual([
+      "schema-supercursus",
+      "canticum-exhalationis",
+    ]);
+    expect(state.cores[0].stress).toBe(2);
+  });
+
+  it("applies center-slot cost reduction from Mechanista", () => {
+    let state = createNewGameState(78);
+    state = withWorkContext(
+      {
+        ...state,
+        power: [1, 0],
+        forgeGrid: [
+          null,
+          null,
+          null,
+          null,
+          "corona-scintillarum",
+          null,
+          null,
+          null,
+          null,
+        ],
+        inPlay: [
+          {
+            instanceId: "mechanist-1",
+            cardId: "mechanista-novem",
+            spellId: "mechanista-novem",
+            controller: 0,
+            type: "Summon",
+            jamCounters: 0,
+            status: "inPlay",
+          },
+        ],
+      },
+      0,
+    );
+
+    expect(canPlayFromForgeSlot(state, 0, 4)).toBe(true);
+  });
+
+  it("cancels bonus power gains with Liber Rubiginis", () => {
+    let state = createNewGameState(79);
+    state = withWorkContext(
+      {
+        ...state,
+        forgeGrid: [
+          "canalis-rupturae",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
+        inPlay: [
+          {
+            instanceId: "ledger-1",
+            cardId: "liber-rubiginis",
+            spellId: "liber-rubiginis",
+            controller: 1,
+            type: "Seal",
+            armed: true,
+            jamCounters: 0,
+            status: "inPlay",
+          },
+        ],
+      },
+      0,
+    );
+
+    state = reduce(state, {
+      type: "AnnounceSpell",
+      player: 0,
+      source: { zone: "forge", slotIndex: 0 },
+      spellId: "canalis-rupturae",
+    });
+    state = reduce(state, { type: "ResolveResponse" });
+
+    expect(state.power[0]).toBe(9);
+    expect(state.spent).toContain("liber-rubiginis");
+  });
+
+  it("uses Custos Incudis replacement on opponent dispels only", () => {
+    let state = createNewGameState(80);
+    state = withWorkContext(
+      {
+        ...state,
+        power: [10, 10],
+        forgeGrid: [
+          "hasta-stellarum",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
+        inPlay: [
+          {
+            instanceId: "ward-1",
+            cardId: "custos-incudis",
+            spellId: "custos-incudis",
+            controller: 1,
+            type: "Summon",
+            jamCounters: 0,
+            status: "inPlay",
+          },
+          {
+            instanceId: "wax-1",
+            cardId: "os-cera-clausum",
+            spellId: "os-cera-clausum",
+            controller: 1,
+            type: "Seal",
+            armed: true,
+            jamCounters: 0,
+            status: "inPlay",
+          },
+        ],
+        nextInstanceNumber: 2,
+      },
+      0,
+    );
+
+    state = reduce(state, {
+      type: "AnnounceSpell",
+      player: 0,
+      source: { zone: "forge", slotIndex: 0 },
+      spellId: "hasta-stellarum",
+    });
+    state = reduce(state, { type: "ResolveResponse" });
+
+    const jammedHasta = state.inPlay.find(
+      (spell) => spell.spellId === "hasta-stellarum",
+    );
+    expect(jammedHasta?.jamCounters).toBe(2);
+    expect(state.cores[1].aether).toBe(1);
+    expect(state.spent).toContain("os-cera-clausum");
+  });
+
+  it("does not grant Chimaera bonus at zero Stress", () => {
+    let state = createNewGameState(81);
+    state = withWorkContext(
+      {
+        ...state,
+        inPlay: [
+          {
+            instanceId: "chim-1",
+            cardId: "chimaera-exhauriens",
+            spellId: "chimaera-exhauriens",
+            controller: 0,
+            type: "Summon",
+            jamCounters: 0,
+            status: "inPlay",
+          },
+        ],
+      },
+      0,
+    );
+
+    state = reduce(state, { type: "AdvancePhase" });
+    expect(state.cores[0].aether).toBe(0);
+    expect(state.cores[0].stress).toBe(0);
   });
 });

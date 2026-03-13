@@ -1,8 +1,9 @@
-import type { PlayerId, SpellType } from "./keywords";
+import type { SpellType } from "./keywords";
 
 export type SpellId = string;
 
 export type AbilityTiming =
+  | "Standby"
   | "Response"
   | "Maintenance"
   | "Static"
@@ -13,10 +14,16 @@ export type PlayWindow = "Work" | "Response" | "Any";
 
 export type TriggerCondition =
   | { kind: "whenAnySpellAnnounced" }
+  | { kind: "whenOpponentAnnounces" }
   | { kind: "whenOpponentSpeaks" }
+  | { kind: "whenAnySpeaks" }
   | { kind: "whenOpponentConjures" }
   | { kind: "whenOpponentPrepares" }
-  | { kind: "whenYouSpeak" };
+  | { kind: "whenYouSpeak" }
+  | { kind: "whenSpellCostIs"; amount: number }
+  | { kind: "whenOpponentSpellCostAtLeast"; amount: number }
+  | { kind: "whenOpponentAnnouncesWithStressAtLeast"; amount: number }
+  | { kind: "whenOpponentAnnouncesFromForgeSlot"; slotIndex: number };
 
 export type CoreTargetSpec =
   | { kind: "selfCore" }
@@ -28,7 +35,10 @@ export type SpellTargetSpec =
   | { kind: "announcedSpell" }
   | { kind: "selfSpell" }
   | { kind: "chosenInPlaySpell" }
-  | { kind: "chosenArmedSeal" };
+  | { kind: "chosenInPlaySpellOptional" }
+  | { kind: "chosenArmedSeal" }
+  | { kind: "chosenSummonWithMaxCost"; maxCost: number }
+  | { kind: "chosenJammedSpell" };
 
 export type Effect =
   | {
@@ -65,6 +75,37 @@ export type Effect =
       type: "Scry";
       amount: number;
       target: "self" | "opponent";
+    }
+  | {
+      type: "GrantForgeSlotDiscount";
+      amount: number;
+      uses: number;
+      target: "chosenForgeSlot";
+    }
+  | {
+      type: "DispelReserveCardForPower";
+      target: "chosenOwnReserveCard";
+      gainPower: number;
+    }
+  | {
+      type: "DispelAnnouncedUnlessControllerGainsStress";
+      stressAmount: number;
+    }
+  | {
+      type: "GainPower";
+      amount: number;
+      target: CoreTargetSpec;
+    }
+  | {
+      type: "SetAether";
+      amount: number;
+      target: CoreTargetSpec;
+    }
+  | {
+      type: "MoveStress";
+      amount: number;
+      from: CoreTargetSpec;
+      to: CoreTargetSpec;
     };
 
 export interface Ability {
@@ -81,11 +122,10 @@ export interface SpellDefinition {
   costPower: number;
   playWindow: PlayWindow;
   rulesText: string;
-  flavorText: string;
   abilities: Ability[];
 }
 
-export type TargetValue = string | PlayerId;
+export type TargetValue = string | number;
 
 export interface TargetChoice {
   effectIndex: number;

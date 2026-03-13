@@ -9,6 +9,7 @@ export interface CoreState {
 
 export interface InPlaySpell {
   instanceId: string;
+  cardId: string;
   spellId: SpellId;
   controller: PlayerId;
   type: SpellType;
@@ -34,6 +35,13 @@ export interface PendingAnnouncement {
   targets: TargetChoice[];
 }
 
+export interface ForgeSlotDiscount {
+  player: PlayerId;
+  slotIndex: number;
+  amount: number;
+  remainingUses: number;
+}
+
 export interface GameState {
   cycleNumber: number;
   activePlayer: PlayerId;
@@ -44,10 +52,11 @@ export interface GameState {
   forgeGrid: (SpellId | null)[];
   spent: SpellId[];
   inPlay: InPlaySpell[];
-  scryReveals: {
+  reserve: {
     player0: SpellId[];
     player1: SpellId[];
   };
+  forgeSlotDiscounts: ForgeSlotDiscount[];
   log: GameEvent[];
 
   phase: Phase;
@@ -59,4 +68,9 @@ export interface GameState {
   seed: number;
   winner: PlayerId | null;
   loser: PlayerId | null;
+
+  workUsageKeys: string[];
+  cycleUsageKeys: string[];
+  turnSpellCount: number;
+  turnIncantationCount: number;
 }

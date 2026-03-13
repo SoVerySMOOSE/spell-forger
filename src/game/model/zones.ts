@@ -6,17 +6,17 @@ export type SpellSource =
       slotIndex: number;
     }
   | {
-      zone: "scry";
-      revealIndex: number;
+      zone: "reserve";
+      reserveIndex: number;
     };
 
-export type ScryRevealMap = {
+export type ReserveMap = {
   player0: string[];
   player1: string[];
 };
 
-export type ScryOwnerKey = keyof ScryRevealMap;
+export type ReserveKey = keyof ReserveMap;
 
-export const scryKeyForPlayer = (player: PlayerId): ScryOwnerKey => {
+export const reserveKeyForPlayer = (player: PlayerId): ReserveKey => {
   return player === 0 ? "player0" : "player1";
 };

@@ -61,7 +61,8 @@ export const createNewGameState = (seed: number): GameState => {
     forgeGrid: filledForge.forgeGrid,
     spent: [],
     inPlay: [],
-    scryReveals: { player0: [], player1: [] },
+    reserve: { player0: [], player1: [] },
+    forgeSlotDiscounts: [],
     log: [],
     phase: "work",
     pendingAnnouncement: null,
@@ -72,10 +73,14 @@ export const createNewGameState = (seed: number): GameState => {
     seed,
     winner: null,
     loser: null,
+    workUsageKeys: [],
+    cycleUsageKeys: [],
+    turnSpellCount: 0,
+    turnIncantationCount: 0,
   };
 
   initial.powerLimit[0] = initial.cycleNumber;
-  initial.power[0] = 0;
+  initial.power[0] = initial.cycleNumber;
 
   initial.log.push({
     id: initial.nextEventId,

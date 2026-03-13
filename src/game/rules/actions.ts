@@ -10,16 +10,19 @@ export type AnnounceSpellAction = {
   targets?: TargetChoice[];
 };
 
+export type ActivateSpellAbilityAction = {
+  type: "ActivateSpellAbility";
+  player: PlayerId;
+  instanceId: string;
+};
+
 export type GameAction =
   | {
       type: "NewGame";
       seed: number;
     }
-  | {
-      type: "DrawPower";
-      player: PlayerId;
-    }
   | AnnounceSpellAction
+  | ActivateSpellAbilityAction
   | {
       type: "ResolveResponse";
     }

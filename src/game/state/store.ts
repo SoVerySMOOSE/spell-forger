@@ -14,7 +14,11 @@ export const useGameStore = (
   initialSeed: number = defaultSeed,
 ): [GameState, Dispatch<GameAction>] => {
   const initialState = useMemo(
-    () => createNewGameState(initialSeed),
+    () =>
+      reduce(createNewGameState(initialSeed), {
+        type: "NewGame",
+        seed: initialSeed,
+      }),
     [initialSeed],
   );
   return useReducer(reduce, initialState);
