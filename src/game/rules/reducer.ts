@@ -536,6 +536,65 @@ const resolveTriggeredResponseAbilities = (state: GameState): GameState => {
   return next;
 };
 
+const hasManualResponseOptions = (state: GameState): boolean => {
+  if (state.phase !== "response" || !state.pendingAnnouncement) {
+    return false;
+  }
+
+  const responder = otherPlayer(state.activePlayer);
+  const canPlayResponseSpell = (spellId: string | null): boolean => {
+    if (!spellId) {
+      return false;
+    }
+    const spell = ALL_SPELLS_BY_ID[spellId];
+    if (!spell) {
+      return false;
+    }
+    if (!canPlayInResponseWindow(spell.playWindow)) {
+      return false;
+    }
+    return state.power[responder] >= spell.costPower;
+  };
+
+  if (state.forgeGrid.some((spellId) => canPlayResponseSpell(spellId))) {
+    return true;
+  }
+
+  const reserveKey = reserveKeyForPlayer(responder);
+  return state.reserve[reserveKey].some((spellId) =>
+    canPlayResponseSpell(spellId),
+  );
+};
+
+const finishPendingResponse = (state: GameState): GameState => {
+  if (state.phase !== "response" || !state.pendingAnnouncement) {
+    return state;
+  }
+
+  const pending = state.pendingAnnouncement;
+  let next = resolveTriggeredResponseAbilities(state);
+  if (next.phase === "gameOver") {
+    return next;
+  }
+
+  next = resolveAnnouncedSpellInstance(
+    next,
+    pending.instanceId,
+    ALL_SPELLS_BY_ID,
+    pending.targets,
+  );
+  next = applyImmediateStressCheck(next);
+  if (next.phase === "gameOver") {
+    return next;
+  }
+
+  return {
+    ...next,
+    phase: "work",
+    pendingAnnouncement: null,
+  };
+};
+
 const resolveUnjammedIncantations = (
   state: GameState,
   player: PlayerId,
@@ -762,7 +821,7 @@ const announceFromWork = (
     player,
   );
 
-  return {
+  const responseState: GameState = {
     ...next,
     phase: "response",
     pendingAnnouncement: {
@@ -773,6 +832,12 @@ const announceFromWork = (
       targets,
     },
   };
+
+  if (!hasManualResponseOptions(responseState)) {
+    return finishPendingResponse(responseState);
+  }
+
+  return responseState;
 };
 
 const announceFromResponse = (
@@ -921,32 +986,7 @@ export const reduce = (state: GameState, action: GameAction): GameState => {
       return state;
     }
     case "ResolveResponse": {
-      if (state.phase !== "response" || !state.pendingAnnouncement) {
-        return state;
-      }
-
-      const pending = state.pendingAnnouncement;
-      let next = resolveTriggeredResponseAbilities(state);
-      if (next.phase === "gameOver") {
-        return next;
-      }
-
-      next = resolveAnnouncedSpellInstance(
-        next,
-        pending.instanceId,
-        ALL_SPELLS_BY_ID,
-        pending.targets,
-      );
-      next = applyImmediateStressCheck(next);
-      if (next.phase === "gameOver") {
-        return next;
-      }
-
-      return {
-        ...next,
-        phase: "work",
-        pendingAnnouncement: null,
-      };
+      return finishPendingResponse(state);
     }
     case "AdvancePhase": {
       if (state.phase !== "work") {
@@ -958,6 +998,18 @@ export const reduce = (state: GameState, action: GameAction): GameState => {
       };
       next = runTimedTriggers(next, "Maintenance");
       next = applyImmediateStressCheck(next);
+      if (next.phase === "gameOver") {
+        return next;
+      }
+
+      const hasUnjamChoices = next.inPlay.some(
+        (spell) =>
+          spell.controller === next.activePlayer && spell.jamCounters > 0,
+      );
+      if (!hasUnjamChoices) {
+        return endTurnFromMaintenance(next);
+      }
+
       return next;
     }
     case "ChooseUnjam": {

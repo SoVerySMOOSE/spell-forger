@@ -1,8 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useState, type KeyboardEvent, type ReactNode } from "react";
 import type { SpellDefinition } from "../model/spell";
 import { getCardPresentation } from "./cardPresentation";
 
-type CardFaceSize = "table" | "rack" | "preview";
+type CardFaceSize = "forge" | "rack" | "preview";
 
 export interface CardFaceProps {
   spell: SpellDefinition;
@@ -13,6 +13,9 @@ export interface CardFaceProps {
   actionLabel?: string;
   onAction?: () => void;
   actionDisabled?: boolean;
+  highlighted?: boolean;
+  selected?: boolean;
+  muted?: boolean;
   footer?: ReactNode;
   onInspect?: () => void;
 }
@@ -26,19 +29,46 @@ export const CardFace = ({
   actionLabel,
   onAction,
   actionDisabled = false,
+  highlighted = false,
+  selected = false,
+  muted = false,
   footer,
   onInspect,
 }: CardFaceProps) => {
   const presentation = getCardPresentation(spell.id, spell.type);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const imageFailed = failedSrc === presentation.artSrc;
+  const isForgeCard = size === "forge";
+  const isInteractiveCard = Boolean(onAction);
+  const tabIndex = onInspect || isInteractiveCard ? 0 : -1;
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (!isInteractiveCard || !onAction) {
+      return;
+    }
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+    event.preventDefault();
+    if (!actionDisabled) {
+      onAction();
+    }
+  };
 
   return (
     <article
-      className={`card-face ${presentation.frameClass} card-face--${size}`}
+      className={`card-face ${presentation.frameClass} card-face--${size} ${
+        isInteractiveCard ? "card-face--interactive" : ""
+      } ${highlighted ? "card-face--targetable" : ""} ${
+        selected ? "card-face--selected" : ""
+      } ${muted ? "card-face--muted" : ""}`}
       onMouseEnter={onInspect}
       onFocus={onInspect}
-      tabIndex={onInspect ? 0 : -1}
+      onClick={isInteractiveCard && !actionDisabled ? onAction : undefined}
+      onKeyDown={handleKeyDown}
+      tabIndex={tabIndex}
+      role={isInteractiveCard ? "button" : undefined}
+      aria-disabled={isInteractiveCard ? actionDisabled : undefined}
     >
       <header className="card-face__header">
         <div className="card-face__type-line">
@@ -73,37 +103,35 @@ export const CardFace = ({
             <span className="card-face__fallback-label">Art slot ready</span>
           </div>
         ) : null}
-      </div>
-
-      <div className="card-face__body">
-        <p className="card-face__rules">{spell.rulesText}</p>
-        {statusChips.length > 0 ? (
-          <div className="card-face__chip-row">
-            {statusChips.map((chip) => (
-              <span key={chip} className="card-face__chip">
-                {chip}
-              </span>
-            ))}
-          </div>
-        ) : null}
-        {metaLines.length > 0 ? (
-          <div className="card-face__meta">
-            {metaLines.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </div>
+        {actionLabel && isInteractiveCard ? (
+          <span className="card-face__action-tag">{actionLabel}</span>
         ) : null}
       </div>
 
-      {actionLabel || footer ? (
-        <footer className="card-face__footer">
-          {actionLabel && onAction ? (
-            <button disabled={actionDisabled} onClick={onAction}>
-              {actionLabel}
-            </button>
+      {!isForgeCard ? (
+        <div className="card-face__body">
+          <p className="card-face__rules">{spell.rulesText}</p>
+          {statusChips.length > 0 ? (
+            <div className="card-face__chip-row">
+              {statusChips.map((chip) => (
+                <span key={chip} className="card-face__chip">
+                  {chip}
+                </span>
+              ))}
+            </div>
           ) : null}
-          {footer}
-        </footer>
+          {metaLines.length > 0 ? (
+            <div className="card-face__meta">
+              {metaLines.map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!isForgeCard && footer ? (
+        <footer className="card-face__footer">{footer}</footer>
       ) : null}
     </article>
   );

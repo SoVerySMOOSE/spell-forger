@@ -5,7 +5,7 @@ import {
   otherPlayer,
   type PlayerId,
 } from "../model/keywords";
-import type { TargetChoice, TargetValue } from "../model/spell";
+import type { Effect, TargetChoice, TargetValue } from "../model/spell";
 import type { SpellSource } from "../model/zones";
 import type { GameAction } from "../rules/actions";
 import { hasWorkUsage, makeWorkUsageKey } from "../rules/usage";
@@ -22,15 +22,86 @@ import {
 import { makeRandomSeed } from "../state/store";
 import { CardFace } from "./CardFace";
 
+type PendingSelectionValue = TargetValue | null;
+
 type PendingCast = {
   player: PlayerId;
   source: SpellSource;
   spellId: string;
   requirements: TargetRequirement[];
-  selections: Partial<Record<number, TargetValue>>;
+  selections: Partial<Record<number, PendingSelectionValue>>;
 };
 
 const PLAYER_ORDER: PlayerId[] = [1, 0];
+
+type InPlayTargetEffect = Extract<Effect, { type: "Dispel" | "Jam" }>;
+type ReserveTargetEffect = Extract<Effect, { type: "DispelReserveCardForPower" }>;
+type ForgeSlotTargetEffect = Extract<Effect, { type: "GrantForgeSlotDiscount" }>;
+type ChosenCoreEffect = Extract<
+  Effect,
+  | { type: "GainAether" }
+  | { type: "GainStress" }
+  | { type: "Vent" }
+  | { type: "GainPower" }
+  | { type: "SetAether" }
+>;
+
+const isInPlayTargetRequirement = (
+  requirement: TargetRequirement,
+): requirement is TargetRequirement & { effect: InPlayTargetEffect } => {
+  const effect = requirement.effect;
+
+  return (
+    (effect.type === "Dispel" || effect.type === "Jam") &&
+    (effect.target.kind === "chosenInPlaySpell" ||
+      effect.target.kind === "chosenInPlaySpellOptional" ||
+      effect.target.kind === "chosenArmedSeal" ||
+      effect.target.kind === "chosenSummonWithMaxCost" ||
+      effect.target.kind === "chosenJammedSpell")
+  );
+};
+
+const isReserveTargetRequirement = (
+  requirement: TargetRequirement,
+): requirement is TargetRequirement & { effect: ReserveTargetEffect } => {
+  return requirement.effect.type === "DispelReserveCardForPower";
+};
+
+const isForgeSlotTargetRequirement = (
+  requirement: TargetRequirement,
+): requirement is TargetRequirement & { effect: ForgeSlotTargetEffect } => {
+  return requirement.effect.type === "GrantForgeSlotDiscount";
+};
+
+const isChosenCoreRequirement = (
+  requirement: TargetRequirement,
+): requirement is TargetRequirement & { effect: ChosenCoreEffect } => {
+  const effect = requirement.effect;
+
+  return (
+    (effect.type === "GainAether" ||
+      effect.type === "GainStress" ||
+      effect.type === "Vent" ||
+      effect.type === "GainPower" ||
+      effect.type === "SetAether") &&
+    effect.target.kind === "chosenCore"
+  );
+};
+
+const getCurrentRequirement = (
+  pendingCast: PendingCast | null,
+): TargetRequirement | null => {
+  if (!pendingCast) {
+    return null;
+  }
+
+  return (
+    pendingCast.requirements.find(
+      (requirement) =>
+        pendingCast.selections[requirement.effectIndex] === undefined,
+    ) ?? null
+  );
+};
 
 const getPlayerLabel = (player: PlayerId): string => `Artificer ${player + 1}`;
 
@@ -89,6 +160,34 @@ const getPreviewFallbackSpellId = (state: GameState): string | null => {
   return null;
 };
 
+const getRequirementPrompt = (requirement: TargetRequirement): string => {
+  if (isInPlayTargetRequirement(requirement)) {
+    const effect = requirement.effect;
+    switch (effect.target.kind) {
+      case "chosenSummonWithMaxCost":
+        return `Choose a Summon in play that costs ${effect.target.maxCost} or less.`;
+      case "chosenArmedSeal":
+        return "Choose an Armed Seal in play.";
+      case "chosenJammedSpell":
+        return "Choose a jammed spell in play.";
+      case "chosenInPlaySpellOptional":
+        return "Choose a spell in play, or skip this target.";
+      default:
+        return "Choose a spell in play.";
+    }
+  }
+
+  if (isReserveTargetRequirement(requirement)) {
+    return "Choose a card from your Reserve to Dispel, or skip it.";
+  }
+
+  if (isForgeSlotTargetRequirement(requirement)) {
+    return "Choose a Forge slot for the discount.";
+  }
+
+  return "Choose the remaining target.";
+};
+
 export interface GameBoardProps {
   state: GameState;
   dispatch: Dispatch<GameAction>;
@@ -101,6 +200,7 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
     {},
   );
   const [inspectedSpellId, setInspectedSpellId] = useState<string | null>(null);
+  const [spentOpen, setSpentOpen] = useState(false);
 
   const actingPlayer: PlayerId | null = useMemo(() => {
     if (state.phase === "work") {
@@ -134,6 +234,70 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
     ? getSpellDefinition(previewSpellId)
     : null;
 
+  const currentRequirement = getCurrentRequirement(pendingCast);
+  const inPlayInstanceIds = useMemo(
+    () => new Set(state.inPlay.map((spell) => spell.instanceId)),
+    [state.inPlay],
+  );
+
+  const chosenInPlayTargetIds = useMemo(() => {
+    if (!pendingCast) {
+      return new Set<string>();
+    }
+
+    return new Set(
+      Object.values(pendingCast.selections).filter(
+        (value): value is string =>
+          typeof value === "string" && inPlayInstanceIds.has(value),
+      ),
+    );
+  }, [inPlayInstanceIds, pendingCast]);
+
+  const legalInPlayTargetIds = useMemo(() => {
+    if (!currentRequirement || !isInPlayTargetRequirement(currentRequirement)) {
+      return new Set<string>();
+    }
+
+    const effect = currentRequirement.effect;
+
+    return new Set(
+      state.inPlay
+        .filter((spell) => {
+          if (chosenInPlayTargetIds.has(spell.instanceId)) {
+            return false;
+          }
+
+          switch (effect.target.kind) {
+            case "chosenInPlaySpell":
+            case "chosenInPlaySpellOptional":
+              return true;
+            case "chosenArmedSeal":
+              return spell.type === "Seal" && spell.armed;
+            case "chosenSummonWithMaxCost":
+              return (
+                spell.type === "Summon" &&
+                getSpellDefinition(spell.spellId).costPower <=
+                  effect.target.maxCost
+              );
+            case "chosenJammedSpell":
+              return spell.jamCounters > 0;
+            default:
+              return false;
+          }
+        })
+        .map((spell) => spell.instanceId),
+    );
+  }, [chosenInPlayTargetIds, currentRequirement, state.inPlay]);
+
+  const isBoardTargetPrompt =
+    currentRequirement !== null &&
+    (isInPlayTargetRequirement(currentRequirement) ||
+      isReserveTargetRequirement(currentRequirement) ||
+      isForgeSlotTargetRequirement(currentRequirement));
+
+  const spentCards = useMemo(() => [...state.spent].reverse(), [state.spent]);
+  const spentTopSpellId = spentCards[0] ?? null;
+
   const openCastFlow = (
     player: PlayerId,
     source: SpellSource,
@@ -162,38 +326,60 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
     });
   };
 
-  const dispatchCast = () => {
-    if (!pendingCast) {
-      return;
-    }
-
-    const requiredRequirements = pendingCast.requirements.filter(
+  const dispatchCast = (cast: PendingCast) => {
+    const requiredRequirements = cast.requirements.filter(
       (requirement) => !requirement.optional,
     );
     if (
       requiredRequirements.some(
-        (requirement) =>
-          pendingCast.selections[requirement.effectIndex] === undefined,
+        (requirement) => cast.selections[requirement.effectIndex] == null,
       )
     ) {
       return;
     }
 
-    const targets: TargetChoice[] = pendingCast.requirements
+    const targets: TargetChoice[] = cast.requirements
       .map((requirement) => ({
         effectIndex: requirement.effectIndex,
-        value: pendingCast.selections[requirement.effectIndex],
+        value: cast.selections[requirement.effectIndex],
       }))
-      .filter((choice) => choice.value !== undefined) as TargetChoice[];
+      .filter(
+        (choice): choice is TargetChoice =>
+          choice.value !== undefined && choice.value !== null,
+      );
 
     dispatch({
       type: "AnnounceSpell",
-      player: pendingCast.player,
-      source: pendingCast.source,
-      spellId: pendingCast.spellId,
+      player: cast.player,
+      source: cast.source,
+      spellId: cast.spellId,
       targets,
     });
     setPendingCast(null);
+  };
+
+  const updatePendingSelection = (
+    effectIndex: number,
+    value: PendingSelectionValue,
+  ) => {
+    if (!pendingCast) {
+      return;
+    }
+
+    const nextCast: PendingCast = {
+      ...pendingCast,
+      selections: {
+        ...pendingCast.selections,
+        [effectIndex]: value,
+      },
+    };
+
+    if (getCurrentRequirement(nextCast) === null) {
+      dispatchCast(nextCast);
+      return;
+    }
+
+    setPendingCast(nextCast);
   };
 
   const refreshSeed = () => {
@@ -202,6 +388,7 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
     setInspectedSpellId(null);
     setPendingCast(null);
     setUnjamSelection({});
+    setSpentOpen(false);
     dispatch({ type: "NewGame", seed: nextSeed });
   };
 
@@ -213,6 +400,7 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
     setInspectedSpellId(null);
     setPendingCast(null);
     setUnjamSelection({});
+    setSpentOpen(false);
     dispatch({ type: "NewGame", seed: Math.trunc(parsed) });
   };
 
@@ -288,6 +476,30 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
               {reserveCards.map((spellId, reserveIndex) => {
                 const spell = getSpellDefinition(spellId);
                 const canPlay = canPlayFromReserve(state, player, reserveIndex);
+                const isReserveTarget =
+                  pendingCast?.player === player &&
+                  currentRequirement !== null &&
+                  isReserveTargetRequirement(currentRequirement);
+                const isSelectedReserveTarget =
+                  isReserveTarget &&
+                  pendingCast.selections[currentRequirement.effectIndex] ===
+                    spell.id;
+                const canSelectReserveTarget = isReserveTarget;
+                const reserveAction =
+                  canSelectReserveTarget && currentRequirement
+                    ? () =>
+                        updatePendingSelection(
+                          currentRequirement.effectIndex,
+                          spell.id,
+                        )
+                    : !pendingCast && canPlay
+                      ? () =>
+                          openCastFlow(
+                            player,
+                            { zone: "reserve", reserveIndex },
+                            spell.id,
+                          )
+                      : undefined;
 
                 return (
                   <CardFace
@@ -295,15 +507,22 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                     spell={spell}
                     size="rack"
                     subtitle="Reserve"
-                    actionLabel={PLAY_VERB_BY_TYPE[spell.type]}
-                    actionDisabled={!canPlay}
-                    onAction={() =>
-                      openCastFlow(
-                        player,
-                        { zone: "reserve", reserveIndex },
-                        spell.id,
-                      )
+                    actionLabel={
+                      isReserveTarget
+                        ? "Target"
+                        : reserveAction
+                          ? PLAY_VERB_BY_TYPE[spell.type]
+                          : undefined
                     }
+                    actionDisabled={reserveAction === undefined}
+                    highlighted={canSelectReserveTarget}
+                    selected={isSelectedReserveTarget}
+                    muted={
+                      Boolean(pendingCast) &&
+                      !canSelectReserveTarget &&
+                      !isSelectedReserveTarget
+                    }
+                    onAction={reserveAction}
                     onInspect={() => setInspectedSpellId(spell.id)}
                   />
                 );
@@ -332,10 +551,31 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                   state.activePlayer === player &&
                   spell.status === "inPlay" &&
                   spell.jamCounters === 0;
-                const actionDisabled =
-                  !canActivate ||
-                  (activationKey !== null &&
-                    hasWorkUsage(state, activationKey));
+                const activationAvailable =
+                  canActivate &&
+                  activationKey !== null &&
+                  !hasWorkUsage(state, activationKey);
+                const isTargetable =
+                  currentRequirement !== null &&
+                  isInPlayTargetRequirement(currentRequirement) &&
+                  legalInPlayTargetIds.has(spell.instanceId);
+                const isSelectedTarget =
+                  chosenInPlayTargetIds.has(spell.instanceId);
+                const inPlayAction =
+                  isTargetable && currentRequirement
+                    ? () =>
+                        updatePendingSelection(
+                          currentRequirement.effectIndex,
+                          spell.instanceId,
+                        )
+                    : !pendingCast && activationAvailable
+                      ? () =>
+                          dispatch({
+                            type: "ActivateSpellAbility",
+                            player,
+                            instanceId: spell.instanceId,
+                          })
+                      : undefined;
 
                 return (
                   <CardFace
@@ -344,18 +584,23 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                     size="rack"
                     subtitle={spell.instanceId}
                     statusChips={getStatusChips(spell)}
-                    actionLabel={activationKey ? "Activate" : undefined}
-                    actionDisabled={actionDisabled}
-                    onAction={
-                      activationKey
-                        ? () =>
-                            dispatch({
-                              type: "ActivateSpellAbility",
-                              player,
-                              instanceId: spell.instanceId,
-                            })
-                        : undefined
+                    actionLabel={
+                      isTargetable
+                        ? "Target"
+                        : inPlayAction
+                          ? "Activate"
+                          : undefined
                     }
+                    actionDisabled={inPlayAction === undefined}
+                    highlighted={isTargetable}
+                    selected={isSelectedTarget}
+                    muted={
+                      currentRequirement !== null &&
+                      isInPlayTargetRequirement(currentRequirement) &&
+                      !isTargetable &&
+                      !isSelectedTarget
+                    }
+                    onAction={inPlayAction}
                     onInspect={() => setInspectedSpellId(spell.spellId)}
                   />
                 );
@@ -395,65 +640,115 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
         <section className="playmat">
           <div className="playmat__glow playmat__glow--left" />
           <div className="playmat__glow playmat__glow--right" />
+          <div className="battlefield">
+            <section className="forge-sanctum">
+              <header className="forge-sanctum__header">
+                <div>
+                  <span className="zone-eyebrow">Shared Forge</span>
+                  <h2>Forge</h2>
+                </div>
+                <div className="forge-readout">
+                  <span className="resource-chip">
+                    <strong>Deck</strong> {state.forgeDeck.length}
+                  </span>
+                  <span className="resource-chip">
+                    <strong>Spent</strong> {state.spent.length}
+                  </span>
+                </div>
+              </header>
 
-          {PLAYER_ORDER.map((player) => renderPlayerZone(player))}
+              <div className="forge-grid forge-grid--cards">
+                {state.forgeGrid.map((spellId, slotIndex) => {
+                  const isForgeTarget =
+                    currentRequirement !== null &&
+                    isForgeSlotTargetRequirement(currentRequirement);
+                  const isSelectedForgeTarget =
+                    isForgeTarget &&
+                    pendingCast?.selections[currentRequirement.effectIndex] ===
+                      slotIndex;
+                  const forgeTargetAction =
+                    isForgeTarget && currentRequirement
+                      ? () =>
+                          updatePendingSelection(
+                            currentRequirement.effectIndex,
+                            slotIndex,
+                          )
+                      : undefined;
 
-          <section className="forge-sanctum">
-            <header className="forge-sanctum__header">
-              <div>
-                <span className="zone-eyebrow">Shared Centerline</span>
-                <h2>Forge</h2>
-              </div>
-              <div className="forge-readout">
-                <span className="resource-chip">
-                  <strong>Deck</strong> {state.forgeDeck.length}
-                </span>
-                <span className="resource-chip">
-                  <strong>Spent</strong> {state.spent.length}
-                </span>
-              </div>
-            </header>
+                  if (!spellId) {
+                    return (
+                      <article
+                        key={slotIndex}
+                        className={`card-slot card-slot--empty ${
+                          isForgeTarget ? "card-slot--targetable" : ""
+                        } ${isSelectedForgeTarget ? "card-slot--selected" : ""}`}
+                        onClick={forgeTargetAction}
+                        role={forgeTargetAction ? "button" : undefined}
+                        tabIndex={forgeTargetAction ? 0 : -1}
+                        onKeyDown={(event) => {
+                          if (!forgeTargetAction) {
+                            return;
+                          }
+                          if (event.key !== "Enter" && event.key !== " ") {
+                            return;
+                          }
+                          event.preventDefault();
+                          forgeTargetAction();
+                        }}
+                      >
+                        <span>
+                          {isForgeTarget
+                            ? `Choose slot ${slotIndex + 1}`
+                            : "Empty Forge slot"}
+                        </span>
+                      </article>
+                    );
+                  }
 
-            <div className="forge-grid forge-grid--cards">
-              {state.forgeGrid.map((spellId, slotIndex) => {
-                if (!spellId) {
+                  const spell = getSpellDefinition(spellId);
+                  const canPlay =
+                    actingPlayer !== null &&
+                    canPlayFromForgeSlot(state, actingPlayer, slotIndex);
+                  const forgeAction =
+                    forgeTargetAction ??
+                    (!pendingCast && canPlay && actingPlayer !== null
+                      ? () =>
+                          openCastFlow(
+                            actingPlayer,
+                            { zone: "forge", slotIndex },
+                            spell.id,
+                          )
+                      : undefined);
+
                   return (
-                    <article
+                    <CardFace
                       key={slotIndex}
-                      className="card-slot card-slot--empty"
-                    >
-                      <span>Empty Forge slot</span>
-                    </article>
+                      spell={spell}
+                      size="forge"
+                      subtitle={`Forge ${slotIndex + 1}`}
+                      actionLabel={
+                        isForgeTarget
+                          ? "Target"
+                          : forgeAction
+                            ? PLAY_VERB_BY_TYPE[spell.type]
+                            : undefined
+                      }
+                      actionDisabled={forgeAction === undefined}
+                      highlighted={isForgeTarget}
+                      selected={isSelectedForgeTarget}
+                      muted={Boolean(pendingCast) && !isForgeTarget}
+                      onAction={forgeAction}
+                      onInspect={() => setInspectedSpellId(spell.id)}
+                    />
                   );
-                }
+                })}
+              </div>
+            </section>
 
-                const spell = getSpellDefinition(spellId);
-                const canPlay =
-                  actingPlayer !== null &&
-                  canPlayFromForgeSlot(state, actingPlayer, slotIndex);
-
-                return (
-                  <CardFace
-                    key={slotIndex}
-                    spell={spell}
-                    size="table"
-                    subtitle={`Forge ${slotIndex + 1}`}
-                    actionLabel={PLAY_VERB_BY_TYPE[spell.type]}
-                    actionDisabled={!canPlay || actingPlayer === null}
-                    onAction={() =>
-                      actingPlayer !== null &&
-                      openCastFlow(
-                        actingPlayer,
-                        { zone: "forge", slotIndex },
-                        spell.id,
-                      )
-                    }
-                    onInspect={() => setInspectedSpellId(spell.id)}
-                  />
-                );
-              })}
+            <div className="bench-column">
+              {PLAYER_ORDER.map((player) => renderPlayerZone(player))}
             </div>
-          </section>
+          </div>
         </section>
 
         <aside className="side-rail">
@@ -489,7 +784,35 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
               </span>
             </div>
 
-            {state.phase === "work" ? (
+            {pendingCast && currentRequirement && isBoardTargetPrompt ? (
+              <div className="targeting-note">
+                <p>
+                  <strong>{getSpellDefinition(pendingCast.spellId).name}</strong>
+                </p>
+                <p>{getRequirementPrompt(currentRequirement)}</p>
+                {isInPlayTargetRequirement(currentRequirement) &&
+                legalInPlayTargetIds.size === 0 ? (
+                  <p>No legal cards are available for this target right now.</p>
+                ) : null}
+                <div className="button-row">
+                  {currentRequirement.optional ? (
+                    <button
+                      onClick={() =>
+                        updatePendingSelection(
+                          currentRequirement.effectIndex,
+                          null,
+                        )
+                      }
+                    >
+                      Skip Target
+                    </button>
+                  ) : null}
+                  <button onClick={() => setPendingCast(null)}>Cancel Cast</button>
+                </div>
+              </div>
+            ) : null}
+
+            {state.phase === "work" && !pendingCast ? (
               <div className="response-panel">
                 <p>
                   Play from the Forge or Reserve, then pass into Maintenance.
@@ -502,7 +825,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
               </div>
             ) : null}
 
-            {state.phase === "response" && state.pendingAnnouncement ? (
+            {state.phase === "response" &&
+            state.pendingAnnouncement &&
+            !pendingCast ? (
               <div className="response-panel">
                 <p>
                   Announced:{" "}
@@ -560,17 +885,30 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
               <h2>Spent</h2>
               <span>{state.spent.length}</span>
             </div>
-            <ul className="plain-list">
-              {state.spent.length === 0 ? (
-                <li>Spent is empty.</li>
-              ) : (
-                state.spent.map((spellId, index) => (
-                  <li key={`${spellId}-${index}`}>
-                    {getSpellDefinition(spellId).name}
-                  </li>
-                ))
-              )}
-            </ul>
+            {spentTopSpellId ? (
+              <>
+                <button
+                  type="button"
+                  className="spent-pile"
+                  onClick={() => setSpentOpen(true)}
+                  onMouseEnter={() => setInspectedSpellId(spentTopSpellId)}
+                  onFocus={() => setInspectedSpellId(spentTopSpellId)}
+                >
+                  <span className="spent-pile__back spent-pile__back--far" />
+                  <span className="spent-pile__back spent-pile__back--near" />
+                  <CardFace
+                    spell={getSpellDefinition(spentTopSpellId)}
+                    size="rack"
+                    subtitle="Top of Spent"
+                  />
+                </button>
+                <p className="helper-text">
+                  Click the pile to fan out the discard and inspect every card.
+                </p>
+              </>
+            ) : (
+              <div className="preview-placeholder">Spent is empty.</div>
+            )}
           </section>
 
           <section className="panel panel--rail">
@@ -588,307 +926,65 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
         </aside>
       </div>
 
-      {pendingCast ? (
+      {spentOpen ? (
+        <div className="modal-scrim" onClick={() => setSpentOpen(false)}>
+          <section
+            className="panel spent-tray"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="panel__header">
+              <h2>Spent Pile</h2>
+              <span>{state.spent.length} cards</span>
+            </div>
+            <div className="spent-grid">
+              {spentCards.map((spellId, index) => (
+                <CardFace
+                  key={`${spellId}-${index}`}
+                  spell={getSpellDefinition(spellId)}
+                  size="rack"
+                  subtitle={index === 0 ? "Top of Spent" : `Spent ${index + 1}`}
+                  onInspect={() => setInspectedSpellId(spellId)}
+                />
+              ))}
+            </div>
+            <div className="button-row">
+              <button onClick={() => setSpentOpen(false)}>Close</button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {pendingCast && currentRequirement && !isBoardTargetPrompt ? (
         <div className="modal-scrim">
           <section className="panel cast-panel">
             <div className="panel__header">
-              <h2>Select Targets</h2>
+              <h2>Select Target</h2>
               <span>{getSpellDefinition(pendingCast.spellId).name}</span>
             </div>
-            <p>Finish the announcement by choosing all required targets.</p>
+            <p>{getRequirementPrompt(currentRequirement)}</p>
             <div className="target-list">
-              {pendingCast.requirements.map((requirement) => {
-                const effect = requirement.effect;
-
-                if (
-                  (effect.type === "Dispel" || effect.type === "Jam") &&
-                  (effect.target.kind === "chosenInPlaySpell" ||
-                    effect.target.kind === "chosenInPlaySpellOptional")
-                ) {
-                  const optional =
-                    effect.target.kind === "chosenInPlaySpellOptional";
-                  return (
-                    <label key={requirement.effectIndex}>
-                      Target spell in play
-                      <select
-                        value={String(
-                          pendingCast.selections[requirement.effectIndex] ?? "",
-                        )}
-                        onChange={(event) =>
-                          setPendingCast((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  selections: {
-                                    ...prev.selections,
-                                    [requirement.effectIndex]:
-                                      event.target.value,
-                                  },
-                                }
-                              : prev,
-                          )
-                        }
-                      >
-                        <option value="">
-                          {optional ? "No target" : "Select a spell"}
-                        </option>
-                        {state.inPlay.map((spell) => (
-                          <option
-                            key={spell.instanceId}
-                            value={spell.instanceId}
-                          >
-                            {getSpellDefinition(spell.spellId).name} (
-                            {spell.instanceId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                }
-
-                if (
-                  effect.type === "Dispel" &&
-                  effect.target.kind === "chosenSummonWithMaxCost"
-                ) {
-                  const { maxCost } = effect.target;
-                  const legalSummons = state.inPlay.filter((spell) => {
-                    if (spell.type !== "Summon") {
-                      return false;
+              {isChosenCoreRequirement(currentRequirement) ? (
+                <>
+                  <button
+                    onClick={() =>
+                      updatePendingSelection(currentRequirement.effectIndex, 0)
                     }
-                    const card = getSpellDefinition(spell.spellId);
-                    return card.costPower <= maxCost;
-                  });
-                  return (
-                    <label key={requirement.effectIndex}>
-                      Target Summon (cost {maxCost} or less)
-                      <select
-                        value={String(
-                          pendingCast.selections[requirement.effectIndex] ?? "",
-                        )}
-                        onChange={(event) =>
-                          setPendingCast((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  selections: {
-                                    ...prev.selections,
-                                    [requirement.effectIndex]:
-                                      event.target.value,
-                                  },
-                                }
-                              : prev,
-                          )
-                        }
-                      >
-                        <option value="">Select a summon</option>
-                        {legalSummons.map((spell) => (
-                          <option
-                            key={spell.instanceId}
-                            value={spell.instanceId}
-                          >
-                            {getSpellDefinition(spell.spellId).name} (
-                            {spell.instanceId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                }
-
-                if (
-                  effect.type === "Dispel" &&
-                  effect.target.kind === "chosenJammedSpell"
-                ) {
-                  const jammedSpells = state.inPlay.filter(
-                    (spell) => spell.jamCounters > 0,
-                  );
-                  return (
-                    <label key={requirement.effectIndex}>
-                      Target jammed spell
-                      <select
-                        value={String(
-                          pendingCast.selections[requirement.effectIndex] ?? "",
-                        )}
-                        onChange={(event) =>
-                          setPendingCast((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  selections: {
-                                    ...prev.selections,
-                                    [requirement.effectIndex]:
-                                      event.target.value,
-                                  },
-                                }
-                              : prev,
-                          )
-                        }
-                      >
-                        <option value="">Select a jammed spell</option>
-                        {jammedSpells.map((spell) => (
-                          <option
-                            key={spell.instanceId}
-                            value={spell.instanceId}
-                          >
-                            {getSpellDefinition(spell.spellId).name} (
-                            {spell.instanceId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                }
-
-                if (
-                  (effect.type === "Dispel" || effect.type === "Jam") &&
-                  effect.target.kind === "chosenArmedSeal"
-                ) {
-                  const armedSeals = state.inPlay.filter(
-                    (spell) => spell.type === "Seal" && spell.armed,
-                  );
-                  return (
-                    <label key={requirement.effectIndex}>
-                      Target armed seal
-                      <select
-                        value={String(
-                          pendingCast.selections[requirement.effectIndex] ?? "",
-                        )}
-                        onChange={(event) =>
-                          setPendingCast((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  selections: {
-                                    ...prev.selections,
-                                    [requirement.effectIndex]:
-                                      event.target.value,
-                                  },
-                                }
-                              : prev,
-                          )
-                        }
-                      >
-                        <option value="">Select a seal</option>
-                        {armedSeals.map((spell) => (
-                          <option
-                            key={spell.instanceId}
-                            value={spell.instanceId}
-                          >
-                            {getSpellDefinition(spell.spellId).name} (
-                            {spell.instanceId})
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                }
-
-                if (effect.type === "GrantForgeSlotDiscount") {
-                  return (
-                    <label key={requirement.effectIndex}>
-                      Choose Forge slot for discount
-                      <select
-                        value={String(
-                          pendingCast.selections[requirement.effectIndex] ?? "",
-                        )}
-                        onChange={(event) =>
-                          setPendingCast((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  selections: {
-                                    ...prev.selections,
-                                    [requirement.effectIndex]: Number(
-                                      event.target.value,
-                                    ),
-                                  },
-                                }
-                              : prev,
-                          )
-                        }
-                      >
-                        <option value="">Select a slot</option>
-                        {Array.from({ length: 9 }).map((_, slotIndex) => (
-                          <option key={slotIndex} value={slotIndex}>
-                            Slot {slotIndex + 1}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                }
-
-                if (effect.type === "DispelReserveCardForPower") {
-                  const key = pendingCast.player === 0 ? "player0" : "player1";
-                  const reserveCards = state.reserve[key];
-                  return (
-                    <label key={requirement.effectIndex}>
-                      Optional: Dispel one card from your Reserve
-                      <select
-                        value={String(
-                          pendingCast.selections[requirement.effectIndex] ?? "",
-                        )}
-                        onChange={(event) =>
-                          setPendingCast((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  selections: {
-                                    ...prev.selections,
-                                    [requirement.effectIndex]:
-                                      event.target.value === ""
-                                        ? undefined
-                                        : event.target.value,
-                                  },
-                                }
-                              : prev,
-                          )
-                        }
-                      >
-                        <option value="">No card</option>
-                        {reserveCards.map((spellId) => (
-                          <option key={spellId} value={spellId}>
-                            {getSpellDefinition(spellId).name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  );
-                }
-
-                return (
-                  <label key={requirement.effectIndex}>
-                    Target core
-                    <select
-                      value={String(
-                        pendingCast.selections[requirement.effectIndex] ?? "",
-                      )}
-                      onChange={(event) =>
-                        setPendingCast((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                selections: {
-                                  ...prev.selections,
-                                  [requirement.effectIndex]: Number(
-                                    event.target.value,
-                                  ) as PlayerId,
-                                },
-                              }
-                            : prev,
-                        )
-                      }
-                    >
-                      <option value="">Select a core</option>
-                      <option value="0">{getPlayerLabel(0)}</option>
-                      <option value="1">{getPlayerLabel(1)}</option>
-                    </select>
-                  </label>
-                );
-              })}
+                  >
+                    {getPlayerLabel(0)}
+                  </button>
+                  <button
+                    onClick={() =>
+                      updatePendingSelection(currentRequirement.effectIndex, 1)
+                    }
+                  >
+                    {getPlayerLabel(1)}
+                  </button>
+                </>
+              ) : (
+                <p>No direct target control is available for this effect yet.</p>
+              )}
             </div>
             <div className="button-row">
-              <button onClick={dispatchCast}>Confirm Cast</button>
               <button onClick={() => setPendingCast(null)}>Cancel</button>
             </div>
           </section>

@@ -3,7 +3,7 @@ import type { SpellDefinition } from "../../model/spell";
 export const INCANTATIONS: SpellDefinition[] = [
   {
     id: "canalis-rupturae",
-    name: "Canalis Rupturae (Channel the Faultline)",
+    name: "Channel the Faultline",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
@@ -21,7 +21,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "schema-supercursus",
-    name: "Schema Supercursus (Overclock Sketch)",
+    name: "Overclock Sketch",
     type: "Incantation",
     costPower: 0,
     playWindow: "Work",
@@ -39,7 +39,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "canticum-exhalationis",
-    name: "Canticum Exhalationis (Venting Canticle)",
+    name: "Venting Canticle",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
@@ -54,7 +54,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "corona-scintillarum",
-    name: "Corona Scintillarum (Crown of Sparks)",
+    name: "Crown of Sparks",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
@@ -72,7 +72,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "siphon-aetheris",
-    name: "Siphon Aetheris (Ether Siphon)",
+    name: "Ether Siphon",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
@@ -94,7 +94,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "inversio-fluxus",
-    name: "Inversio Fluxus (Invert the Flow)",
+    name: "Invert the Flow",
     type: "Incantation",
     costPower: 3,
     playWindow: "Work",
@@ -116,7 +116,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "analysis-rupturae",
-    name: "Analysis Rupturae (Breakpoint Analysis)",
+    name: "Breakpoint Analysis",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
@@ -139,7 +139,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "recordatio-cineris",
-    name: "Recordatio Cineris (Ashen Recall)",
+    name: "Ashen Recall",
     type: "Incantation",
     costPower: 0,
     playWindow: "Work",
@@ -157,7 +157,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "hasta-stellarum",
-    name: "Hasta Stellarum (Starfire Lance)",
+    name: "Starfire Lance",
     type: "Incantation",
     costPower: 3,
     playWindow: "Work",
@@ -175,7 +175,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "diluvium-aetheris",
-    name: "Diluvium Aetheris (Aether Flood)",
+    name: "Aether Flood",
     type: "Incantation",
     costPower: 4,
     playWindow: "Work",
@@ -193,7 +193,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "formula-cataclysmatis",
-    name: "Formula Cataclysmatis (Cataclysm Formula)",
+    name: "Cataclysm Formula",
     type: "Incantation",
     costPower: 5,
     playWindow: "Work",
@@ -211,7 +211,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "incus-cadens",
-    name: "Incus Cadens (Hammerfall Hex)",
+    name: "Hammerfall Hex",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
@@ -231,7 +231,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "forfex-runarum",
-    name: "Forfex Runarum (Sever the Tripwire)",
+    name: "Sever the Tripwire",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
@@ -246,7 +246,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "aequatio-susurrans",
-    name: "Aequatio Susurrans (Hushed Equation)",
+    name: "Hushed Equation",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
@@ -272,7 +272,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "rivus-retusus",
-    name: "Rivus Retusus (Unmake the Rivet)",
+    name: "Unmake the Rivet",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
@@ -287,7 +287,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "compas-witchlight",
-    name: "Compas Witchlight (Witchlight Compass)",
+    name: "Witchlight Compass",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
@@ -310,7 +310,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "minuta-mutuata",
-    name: "Minuta Mutuata (Borrowed Minute)",
+    name: "Borrowed Minute",
     type: "Incantation",
     costPower: 1,
     playWindow: "Response",
@@ -329,7 +329,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "syllaba-nulla",
-    name: "Syllaba Nulla (Null-Syllable)",
+    name: "Null-Syllable",
     type: "Incantation",
     costPower: 1,
     playWindow: "Response",
@@ -350,7 +350,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "tempus-perfectum",
-    name: "Tempus Perfectum (Perfect Timing)",
+    name: "Perfect Timing",
     type: "Incantation",
     costPower: 2,
     playWindow: "Response",
@@ -367,7 +367,7 @@ export const INCANTATIONS: SpellDefinition[] = [
   },
   {
     id: "rebuttal-staticus",
-    name: "Rebuttal Staticus (Static Rebuttal)",
+    name: "Static Rebuttal",
     type: "Incantation",
     costPower: 2,
     playWindow: "Response",

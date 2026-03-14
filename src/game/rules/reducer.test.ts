@@ -63,7 +63,7 @@ describe("forge refill", () => {
 });
 
 describe("response resolution", () => {
-  it("Dispel in response cancels an announced Incantation", () => {
+  it("auto-resolves response when there are no manual response options", () => {
     let state = createNewGameState(11);
     state = withWorkContext(
       {
@@ -102,9 +102,6 @@ describe("response resolution", () => {
       source: { zone: "forge", slotIndex: 0 },
       spellId: "hasta-stellarum",
     });
-    expect(state.phase).toBe("response");
-
-    state = reduce(state, { type: "ResolveResponse" });
 
     expect(state.phase).toBe("work");
     expect(state.cores[0].aether).toBe(0);
@@ -112,6 +109,41 @@ describe("response resolution", () => {
     expect(
       state.inPlay.some((spell) => spell.spellId === "hasta-stellarum"),
     ).toBe(false);
+  });
+
+  it("keeps the response window open when the opponent can manually respond", () => {
+    let state = createNewGameState(12);
+    state = withWorkContext(
+      {
+        ...state,
+        forgeGrid: [
+          "hasta-stellarum",
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+        ],
+        reserve: {
+          player0: [],
+          player1: ["rebuttal-staticus"],
+        },
+      },
+      0,
+    );
+
+    state = reduce(state, {
+      type: "AnnounceSpell",
+      player: 0,
+      source: { zone: "forge", slotIndex: 0 },
+      spellId: "hasta-stellarum",
+    });
+
+    expect(state.phase).toBe("response");
+    expect(state.pendingAnnouncement?.spellId).toBe("hasta-stellarum");
   });
 
   it("jammed Incantation does not resolve until unjammed during Maintenance", () => {
@@ -153,7 +185,6 @@ describe("response resolution", () => {
       source: { zone: "forge", slotIndex: 0 },
       spellId: "hasta-stellarum",
     });
-    state = reduce(state, { type: "ResolveResponse" });
 
     const jammed = state.inPlay.find(
       (spell) => spell.spellId === "hasta-stellarum",
@@ -209,7 +240,6 @@ describe("reserve lifecycle", () => {
       source: { zone: "forge", slotIndex: 0 },
       spellId: "corona-scintillarum",
     });
-    state = reduce(state, { type: "ResolveResponse" });
 
     expect(state.reserve.player0).toEqual(["siphon-aetheris", "lemur-cineris"]);
 
@@ -275,7 +305,6 @@ describe("objectives", () => {
       source: { zone: "forge", slotIndex: 0 },
       spellId: "hasta-stellarum",
     });
-    state = reduce(state, { type: "ResolveResponse" });
 
     expect(state.phase).toBe("gameOver");
     expect(state.winner).toBe(1);
@@ -441,7 +470,6 @@ describe("advanced cards", () => {
       source: { zone: "forge", slotIndex: 0 },
       spellId: "canalis-rupturae",
     });
-    state = reduce(state, { type: "ResolveResponse" });
 
     expect(state.power[0]).toBe(9);
     expect(state.spent).toContain("liber-rubiginis");
@@ -496,7 +524,6 @@ describe("advanced cards", () => {
       source: { zone: "forge", slotIndex: 0 },
       spellId: "hasta-stellarum",
     });
-    state = reduce(state, { type: "ResolveResponse" });
 
     const jammedHasta = state.inPlay.find(
       (spell) => spell.spellId === "hasta-stellarum",
@@ -527,7 +554,45 @@ describe("advanced cards", () => {
     );
 
     state = reduce(state, { type: "AdvancePhase" });
+    expect(state.phase).toBe("work");
+    expect(state.activePlayer).toBe(1);
     expect(state.cores[0].aether).toBe(0);
     expect(state.cores[0].stress).toBe(0);
+  });
+
+  it("auto-finishes maintenance when there are no unjam choices", () => {
+    let state = createNewGameState(82);
+    state = withWorkContext(state, 0);
+
+    state = reduce(state, { type: "AdvancePhase" });
+
+    expect(state.phase).toBe("work");
+    expect(state.activePlayer).toBe(1);
+  });
+
+  it("keeps maintenance open when the active player has jammed spells", () => {
+    let state = createNewGameState(83);
+    state = withWorkContext(
+      {
+        ...state,
+        inPlay: [
+          {
+            instanceId: "jammed-1",
+            cardId: "lemur-cineris",
+            spellId: "lemur-cineris",
+            controller: 0,
+            type: "Summon",
+            jamCounters: 2,
+            status: "inPlay",
+          },
+        ],
+      },
+      0,
+    );
+
+    state = reduce(state, { type: "AdvancePhase" });
+
+    expect(state.phase).toBe("maintenance_unjam");
+    expect(state.activePlayer).toBe(0);
   });
 });

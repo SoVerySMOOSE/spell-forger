@@ -3,7 +3,7 @@ import type { SpellDefinition } from "../../model/spell";
 export const SEALS: SpellDefinition[] = [
   {
     id: "filum-argenti-vivi",
-    name: "Filum Argenti Vivi (Quicksilver Tripwire)",
+    name: "Quicksilver Tripwire",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -20,7 +20,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "valva-fuliginis",
-    name: "Valva Fuliginis (Soot-Stopper Valve)",
+    name: "Soot-Stopper Valve",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -29,7 +29,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "acus-siphonis",
-    name: "Acus Siphonis (Siphon Needle)",
+    name: "Siphon Needle",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -38,7 +38,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "amuletum-hamuli-speculi",
-    name: "Amuletum Hamuli Speculi (Mirrorhook Talisman)",
+    name: "Mirrorhook Talisman",
     type: "Seal",
     costPower: 3,
     playWindow: "Work",
@@ -48,7 +48,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "os-cera-clausum",
-    name: "Os Cera Clausum (Wax-Sealed Mouth)",
+    name: "Wax-Sealed Mouth",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -65,7 +65,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "sigillum-lubricum",
-    name: "Sigillum Lubricum (Grease-Slick Sigil)",
+    name: "Grease-Slick Sigil",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -84,7 +84,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "laqueus-ferri-frigidi",
-    name: "Laqueus Ferri Frigidi (Cold-Iron Snare)",
+    name: "Cold-Iron Snare",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -103,7 +103,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "monile-ultionis",
-    name: "Monile Ultionis (Grudge Locket)",
+    name: "Grudge Locket",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -113,7 +113,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "clepsydra-fissa",
-    name: "Clepsydra Fissa (Cracked Hourglass)",
+    name: "Cracked Hourglass",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -132,7 +132,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "amuletum-furis",
-    name: "Amuletum Furis (Thief-Catcher Charm)",
+    name: "Thief-Catcher Charm",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -142,7 +142,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "abacus-invidiae",
-    name: "Abacus Invidiae (Spiteful Abacus)",
+    name: "Spiteful Abacus",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -152,7 +152,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "forfex-sigilli",
-    name: "Forfex Sigilli (Rune-Scissors)",
+    name: "Rune-Scissors",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -169,7 +169,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "corona-cava",
-    name: "Corona Cava (Hollow Crown)",
+    name: "Hollow Crown",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -179,7 +179,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "plumbum-iudicis",
-    name: "Plumbum Iudicis (Lead-Plumb Bob)",
+    name: "Lead-Plumb Bob",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -196,7 +196,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "funis-salis",
-    name: "Funis Salis (Salted Fuse)",
+    name: "Salted Fuse",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -206,7 +206,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "liber-rubiginis",
-    name: "Liber Rubiginis (Ledger of Rust)",
+    name: "Ledger of Rust",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -216,7 +216,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "clavus-in-rota",
-    name: "Clavus in Rota (Nail-in-the-Gear)",
+    name: "Nail-in-the-Gear",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -233,7 +233,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "pellis-anguillae",
-    name: "Pellis Anguillae (Eel-Skin Insulation)",
+    name: "Eel-Skin Insulation",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -243,7 +243,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "patella-cineris",
-    name: "Patella Cineris (Ash-Catcher Pan)",
+    name: "Ash-Catcher Pan",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -259,7 +259,7 @@ export const SEALS: SpellDefinition[] = [
   },
   {
     id: "magnes-gibbosi",
-    name: "Magnes Gibbosi (Gallows Magnet)",
+    name: "Gallows Magnet",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",

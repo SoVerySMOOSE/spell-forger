@@ -3,7 +3,7 @@ import type { SpellDefinition } from "../../model/spell";
 export const SUMMONS: SpellDefinition[] = [
   {
     id: "lemur-cineris",
-    name: "Lemur Cineris (Cinder-Kettle Imp)",
+    name: "Cinder-Kettle Imp",
     type: "Summon",
     costPower: 1,
     playWindow: "Work",
@@ -12,7 +12,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "oraculum-specilli",
-    name: "Oraculum Specilli (Scryglass Oracle)",
+    name: "Scryglass Oracle",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -21,7 +21,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "lucerna-scintillarum",
-    name: "Lucerna Scintillarum (Lantern of Unspent Sparks)",
+    name: "Lantern of Unspent Sparks",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -31,7 +31,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "turris-runarum",
-    name: "Turris Runarum (Runebolt Turret)",
+    name: "Runebolt Turret",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -51,7 +51,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "draco-velluminis",
-    name: "Draco Velluminis (Vellum-Scale Drake)",
+    name: "Vellum-Scale Drake",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -61,7 +61,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "scriba-aeris",
-    name: "Scriba Aeris (Brassbone Scribe)",
+    name: "Brassbone Scribe",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -71,7 +71,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "aegis-sancti-ferri",
-    name: "Aegis Sancti Ferri (Saint's Iron Aegis)",
+    name: "Saint's Iron Aegis",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -81,7 +81,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "galea-speculi-atrati",
-    name: "Galea Speculi Atrati (Blackglass Mirrorhelm)",
+    name: "Blackglass Mirrorhelm",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -91,7 +91,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "mechanista-novem",
-    name: "Mechanista Novem (Nine-Slot Mechanist)",
+    name: "Nine-Slot Mechanist",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -101,7 +101,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "venator-fornacis",
-    name: "Venator Fornacis (Forge-Row Prowler)",
+    name: "Forge-Row Prowler",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -111,7 +111,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "chimaera-exhauriens",
-    name: "Chimaera Exhauriens (Spiral Exhaust Chimera)",
+    name: "Spiral Exhaust Chimera",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -121,7 +121,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "basiliscus-riveti",
-    name: "Basiliscus Riveti (Rivetseam Basilisk)",
+    name: "Rivetseam Basilisk",
     type: "Summon",
     costPower: 4,
     playWindow: "Work",
@@ -131,7 +131,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "custos-campanae",
-    name: "Custos Campanae (Cathedral Bell-Sentinel)",
+    name: "Cathedral Bell-Sentinel",
     type: "Summon",
     costPower: 5,
     playWindow: "Work",
@@ -140,7 +140,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "cor-crucibuli",
-    name: "Cor Crucibuli (Crucible Heart-Golem)",
+    name: "Crucible Heart-Golem",
     type: "Summon",
     costPower: 4,
     playWindow: "Work",
@@ -149,7 +149,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "leviathan-atramenti",
-    name: "Leviathan Atramenti (Ink-Tide Leviathan)",
+    name: "Ink-Tide Leviathan",
     type: "Summon",
     costPower: 6,
     playWindow: "Work",
@@ -168,7 +168,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "custos-incudis",
-    name: "Custos Incudis (Oath-Anvil Warden)",
+    name: "Oath-Anvil Warden",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -178,7 +178,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "auditor-fuliginis",
-    name: "Auditor Fuliginis (Soot-Clock Auditor)",
+    name: "Soot-Clock Auditor",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -195,7 +195,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "archivista-riftis",
-    name: "Archivista Riftis (Rift Archivist)",
+    name: "Rift Archivist",
     type: "Summon",
     costPower: 4,
     playWindow: "Work",
@@ -205,7 +205,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "seraph-reticuli",
-    name: "Seraph Reticuli (Chain-Lattice Seraph)",
+    name: "Chain-Lattice Seraph",
     type: "Summon",
     costPower: 6,
     playWindow: "Work",
@@ -223,7 +223,7 @@ export const SUMMONS: SpellDefinition[] = [
   },
   {
     id: "duelista-carbonis",
-    name: "Duelista Carbonis (Coal-Crowned Duelist)",
+    name: "Coal-Crowned Duelist",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
