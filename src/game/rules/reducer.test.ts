@@ -69,7 +69,7 @@ describe("response resolution", () => {
       {
         ...state,
         forgeGrid: [
-          "hasta-stellarum",
+          "tinkers-charm",
           null,
           null,
           null,
@@ -82,8 +82,8 @@ describe("response resolution", () => {
         inPlay: [
           {
             instanceId: "seal-1",
-            cardId: "os-cera-clausum",
-            spellId: "os-cera-clausum",
+            cardId: "mouth-sealing-wax",
+            spellId: "mouth-sealing-wax",
             controller: 1,
             type: "Seal",
             armed: true,
@@ -100,14 +100,14 @@ describe("response resolution", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "hasta-stellarum",
+      spellId: "tinkers-charm",
     });
 
     expect(state.phase).toBe("work");
     expect(state.cores[0].aether).toBe(0);
-    expect(state.spent).toEqual(expect.arrayContaining(["hasta-stellarum"]));
+    expect(state.spent).toEqual(expect.arrayContaining(["tinkers-charm"]));
     expect(
-      state.inPlay.some((spell) => spell.spellId === "hasta-stellarum"),
+      state.inPlay.some((spell) => spell.spellId === "tinkers-charm"),
     ).toBe(false);
   });
 
@@ -117,7 +117,7 @@ describe("response resolution", () => {
       {
         ...state,
         forgeGrid: [
-          "hasta-stellarum",
+          "tinkers-charm",
           null,
           null,
           null,
@@ -129,7 +129,7 @@ describe("response resolution", () => {
         ],
         reserve: {
           player0: [],
-          player1: ["rebuttal-staticus"],
+          player1: ["static-rebuttal"],
         },
       },
       0,
@@ -139,11 +139,11 @@ describe("response resolution", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "hasta-stellarum",
+      spellId: "tinkers-charm",
     });
 
     expect(state.phase).toBe("response");
-    expect(state.pendingAnnouncement?.spellId).toBe("hasta-stellarum");
+    expect(state.pendingAnnouncement?.spellId).toBe("tinkers-charm");
   });
 
   it("jammed Incantation does not resolve until unjammed during Maintenance", () => {
@@ -152,7 +152,7 @@ describe("response resolution", () => {
       {
         ...state,
         forgeGrid: [
-          "hasta-stellarum",
+          "tinkers-charm",
           null,
           null,
           null,
@@ -165,8 +165,8 @@ describe("response resolution", () => {
         inPlay: [
           {
             instanceId: "seal-2",
-            cardId: "clepsydra-fissa",
-            spellId: "clepsydra-fissa",
+            cardId: "hourglass",
+            spellId: "hourglass",
             controller: 1,
             type: "Seal",
             armed: true,
@@ -183,11 +183,11 @@ describe("response resolution", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "hasta-stellarum",
+      spellId: "tinkers-charm",
     });
 
     const jammed = state.inPlay.find(
-      (spell) => spell.spellId === "hasta-stellarum",
+      (spell) => spell.spellId === "tinkers-charm",
     );
     expect(jammed).toBeDefined();
     expect(jammed?.jamCounters).toBe(1);
@@ -204,9 +204,9 @@ describe("response resolution", () => {
     });
 
     expect(
-      state.inPlay.some((spell) => spell.spellId === "hasta-stellarum"),
+      state.inPlay.some((spell) => spell.spellId === "tinkers-charm"),
     ).toBe(false);
-    expect(state.spent).toEqual(expect.arrayContaining(["hasta-stellarum"]));
+    expect(state.spent).toEqual(expect.arrayContaining(["tinkers-charm"]));
     expect(state.cores[0].aether).toBe(4);
     expect(state.cores[0].stress).toBe(2);
   });
@@ -219,7 +219,7 @@ describe("reserve lifecycle", () => {
       {
         ...state,
         forgeGrid: [
-          "corona-scintillarum",
+          "crown-of-sparks",
           null,
           null,
           null,
@@ -229,7 +229,7 @@ describe("reserve lifecycle", () => {
           null,
           null,
         ],
-        forgeDeck: ["siphon-aetheris", "lemur-cineris", "turris-runarum"],
+        forgeDeck: ["aether-siphon", "reckless-imp", "hexing-turret"],
       },
       0,
     );
@@ -238,20 +238,20 @@ describe("reserve lifecycle", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "corona-scintillarum",
+      spellId: "crown-of-sparks",
     });
 
-    expect(state.reserve.player0).toEqual(["siphon-aetheris", "lemur-cineris"]);
+    expect(state.reserve.player0).toEqual(["aether-siphon", "reckless-imp"]);
 
     state = finishTurn(state);
     expect(state.activePlayer).toBe(1);
-    expect(state.reserve.player0).toEqual(["siphon-aetheris", "lemur-cineris"]);
+    expect(state.reserve.player0).toEqual(["aether-siphon", "reckless-imp"]);
 
     const invalid = reduce(state, {
       type: "AnnounceSpell",
       player: 1,
       source: { zone: "reserve", reserveIndex: 0 },
-      spellId: "siphon-aetheris",
+      spellId: "aether-siphon",
     });
     expect(invalid).toEqual(state);
   });
@@ -285,7 +285,7 @@ describe("objectives", () => {
           { aether: 0, stress: 0 },
         ],
         forgeGrid: [
-          "hasta-stellarum",
+          "tinkers-charm",
           null,
           null,
           null,
@@ -303,7 +303,7 @@ describe("objectives", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "hasta-stellarum",
+      spellId: "tinkers-charm",
     });
 
     expect(state.phase).toBe("gameOver");
@@ -347,8 +347,8 @@ describe("advanced cards", () => {
         inPlay: [
           {
             instanceId: "lemur-1",
-            cardId: "lemur-cineris",
-            spellId: "lemur-cineris",
+            cardId: "reckless-imp",
+            spellId: "reckless-imp",
             controller: 0,
             type: "Summon",
             jamCounters: 0,
@@ -356,15 +356,15 @@ describe("advanced cards", () => {
           },
           {
             instanceId: "oracle-1",
-            cardId: "oraculum-specilli",
-            spellId: "oraculum-specilli",
+            cardId: "town-scryer",
+            spellId: "town-scryer",
             controller: 0,
             type: "Summon",
             jamCounters: 0,
             status: "inPlay",
           },
         ],
-        forgeDeck: ["schema-supercursus", "canticum-exhalationis"],
+        forgeDeck: ["overclock", "venting-canticle"],
       },
       0,
     );
@@ -390,10 +390,7 @@ describe("advanced cards", () => {
       player: 0,
       instanceId: "oracle-1",
     });
-    expect(state.reserve.player0).toEqual([
-      "schema-supercursus",
-      "canticum-exhalationis",
-    ]);
+    expect(state.reserve.player0).toEqual(["overclock", "venting-canticle"]);
     expect(state.cores[0].stress).toBe(2);
   });
 
@@ -408,7 +405,7 @@ describe("advanced cards", () => {
           null,
           null,
           null,
-          "corona-scintillarum",
+          "crown-of-sparks",
           null,
           null,
           null,
@@ -417,8 +414,8 @@ describe("advanced cards", () => {
         inPlay: [
           {
             instanceId: "mechanist-1",
-            cardId: "mechanista-novem",
-            spellId: "mechanista-novem",
+            cardId: "nine-slot-mechanist",
+            spellId: "nine-slot-mechanist",
             controller: 0,
             type: "Summon",
             jamCounters: 0,
@@ -438,7 +435,7 @@ describe("advanced cards", () => {
       {
         ...state,
         forgeGrid: [
-          "canalis-rupturae",
+          "channel-the-faultline",
           null,
           null,
           null,
@@ -451,8 +448,8 @@ describe("advanced cards", () => {
         inPlay: [
           {
             instanceId: "ledger-1",
-            cardId: "liber-rubiginis",
-            spellId: "liber-rubiginis",
+            cardId: "rusty-ledger",
+            spellId: "rusty-ledger",
             controller: 1,
             type: "Seal",
             armed: true,
@@ -468,11 +465,11 @@ describe("advanced cards", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "canalis-rupturae",
+      spellId: "channel-the-faultline",
     });
 
     expect(state.power[0]).toBe(9);
-    expect(state.spent).toContain("liber-rubiginis");
+    expect(state.spent).toContain("rusty-ledger");
   });
 
   it("uses Custos Incudis replacement on opponent dispels only", () => {
@@ -482,7 +479,7 @@ describe("advanced cards", () => {
         ...state,
         power: [10, 10],
         forgeGrid: [
-          "hasta-stellarum",
+          "tinkers-charm",
           null,
           null,
           null,
@@ -495,8 +492,8 @@ describe("advanced cards", () => {
         inPlay: [
           {
             instanceId: "ward-1",
-            cardId: "custos-incudis",
-            spellId: "custos-incudis",
+            cardId: "anvil-warden",
+            spellId: "anvil-warden",
             controller: 1,
             type: "Summon",
             jamCounters: 0,
@@ -504,8 +501,8 @@ describe("advanced cards", () => {
           },
           {
             instanceId: "wax-1",
-            cardId: "os-cera-clausum",
-            spellId: "os-cera-clausum",
+            cardId: "mouth-sealing-wax",
+            spellId: "mouth-sealing-wax",
             controller: 1,
             type: "Seal",
             armed: true,
@@ -522,15 +519,15 @@ describe("advanced cards", () => {
       type: "AnnounceSpell",
       player: 0,
       source: { zone: "forge", slotIndex: 0 },
-      spellId: "hasta-stellarum",
+      spellId: "tinkers-charm",
     });
 
     const jammedHasta = state.inPlay.find(
-      (spell) => spell.spellId === "hasta-stellarum",
+      (spell) => spell.spellId === "tinkers-charm",
     );
     expect(jammedHasta?.jamCounters).toBe(2);
     expect(state.cores[1].aether).toBe(1);
-    expect(state.spent).toContain("os-cera-clausum");
+    expect(state.spent).toContain("mouth-sealing-wax");
   });
 
   it("does not grant Chimaera bonus at zero Stress", () => {
@@ -541,8 +538,8 @@ describe("advanced cards", () => {
         inPlay: [
           {
             instanceId: "chim-1",
-            cardId: "chimaera-exhauriens",
-            spellId: "chimaera-exhauriens",
+            cardId: "billowing-archon",
+            spellId: "billowing-archon",
             controller: 0,
             type: "Summon",
             jamCounters: 0,
@@ -578,8 +575,8 @@ describe("advanced cards", () => {
         inPlay: [
           {
             instanceId: "jammed-1",
-            cardId: "lemur-cineris",
-            spellId: "lemur-cineris",
+            cardId: "reckless-imp",
+            spellId: "reckless-imp",
             controller: 0,
             type: "Summon",
             jamCounters: 2,

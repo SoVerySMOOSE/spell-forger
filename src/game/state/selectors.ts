@@ -84,7 +84,7 @@ const getForgeSlotCost = (
     const mechanista = state.inPlay.find(
       (entry) =>
         entry.controller === player &&
-        entry.spellId === "mechanista-novem" &&
+        entry.spellId === "nine-slot-mechanist" &&
         isReadyInPlay(entry),
     );
     if (mechanista) {

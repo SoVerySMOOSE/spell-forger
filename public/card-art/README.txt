@@ -1,9 +1,9 @@
 Place card art files here using the spell id as the filename.
 
 Examples:
-- lemur-cineris.jpg
-- hasta-stellarum.jpg
-- os-cera-clausum.jpg
+- reckless-imp.jpg
+- tinkers-charm.jpg
+- mouth-sealing-wax.jpg
 
 The UI will automatically look for:
 public/card-art/<spellId>.jpg

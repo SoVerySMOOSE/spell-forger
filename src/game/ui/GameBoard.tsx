@@ -35,8 +35,14 @@ type PendingCast = {
 const PLAYER_ORDER: PlayerId[] = [1, 0];
 
 type InPlayTargetEffect = Extract<Effect, { type: "Dispel" | "Jam" }>;
-type ReserveTargetEffect = Extract<Effect, { type: "DispelReserveCardForPower" }>;
-type ForgeSlotTargetEffect = Extract<Effect, { type: "GrantForgeSlotDiscount" }>;
+type ReserveTargetEffect = Extract<
+  Effect,
+  { type: "DispelReserveCardForPower" }
+>;
+type ForgeSlotTargetEffect = Extract<
+  Effect,
+  { type: "GrantForgeSlotDiscount" }
+>;
 type ChosenCoreEffect = Extract<
   Effect,
   | { type: "GainAether" }
@@ -122,9 +128,9 @@ const getPhaseLabel = (phase: GameState["phase"]): string => {
 
 const getActivationKey = (spell: InPlaySpell): string | null => {
   switch (spell.spellId) {
-    case "lemur-cineris":
+    case "reckless-imp":
       return makeWorkUsageKey(spell.instanceId, "lemur-work-activate");
-    case "oraculum-specilli":
+    case "town-scryer":
       return makeWorkUsageKey(spell.instanceId, "oraculum-work-activate");
     default:
       return null;
@@ -559,8 +565,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                   currentRequirement !== null &&
                   isInPlayTargetRequirement(currentRequirement) &&
                   legalInPlayTargetIds.has(spell.instanceId);
-                const isSelectedTarget =
-                  chosenInPlayTargetIds.has(spell.instanceId);
+                const isSelectedTarget = chosenInPlayTargetIds.has(
+                  spell.instanceId,
+                );
                 const inPlayAction =
                   isTargetable && currentRequirement
                     ? () =>
@@ -617,10 +624,8 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
       <header className="masthead">
         <div className="masthead__copy">
           <span className="masthead__eyebrow">Prototype Table</span>
-          <h1>Arcane Forge</h1>
-          <p>
-            Card-face rendering, art hooks, and a playmat board are now wired.
-          </p>
+          <h1>Spell Forger</h1>
+          <p>Prototype build.</p>
         </div>
         <div className="masthead__controls">
           <label>
@@ -772,7 +777,7 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
             <p className="helper-text">
               Art hook: place files in `public/card-art/` using the card
               `spellId` as the filename, for example
-              `public/card-art/lemur-cineris.jpg`.
+              `public/card-art/reckless-imp.jpg`.
             </p>
           </section>
 
@@ -787,7 +792,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
             {pendingCast && currentRequirement && isBoardTargetPrompt ? (
               <div className="targeting-note">
                 <p>
-                  <strong>{getSpellDefinition(pendingCast.spellId).name}</strong>
+                  <strong>
+                    {getSpellDefinition(pendingCast.spellId).name}
+                  </strong>
                 </p>
                 <p>{getRequirementPrompt(currentRequirement)}</p>
                 {isInPlayTargetRequirement(currentRequirement) &&
@@ -807,7 +814,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                       Skip Target
                     </button>
                   ) : null}
-                  <button onClick={() => setPendingCast(null)}>Cancel Cast</button>
+                  <button onClick={() => setPendingCast(null)}>
+                    Cancel Cast
+                  </button>
                 </div>
               </div>
             ) : null}
@@ -981,7 +990,9 @@ export const GameBoard = ({ state, dispatch }: GameBoardProps) => {
                   </button>
                 </>
               ) : (
-                <p>No direct target control is available for this effect yet.</p>
+                <p>
+                  No direct target control is available for this effect yet.
+                </p>
               )}
             </div>
             <div className="button-row">

@@ -230,7 +230,7 @@ const runTimedTriggers = (
     }
 
     switch (instance.spellId) {
-      case "chimaera-exhauriens": {
+      case "billowing-archon": {
         if (next.cores[instance.controller].stress > 0) {
           next = applyEffects(
             next,
@@ -246,7 +246,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "draco-velluminis": {
+      case "fueling-drake": {
         if (next.turnIncantationCount > 0) {
           next = applyEffects(
             next,
@@ -259,7 +259,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "basiliscus-riveti": {
+      case "basilisk": {
         const opp = otherPlayer(instance.controller);
         if (next.cores[opp].stress >= 5) {
           next = applyEffects(
@@ -279,7 +279,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "custos-campanae": {
+      case "cathedral-sentinel": {
         if (next.cores[instance.controller].stress === 0) {
           next = applyEffects(
             next,
@@ -292,7 +292,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "cor-crucibuli": {
+      case "crucible-stoker": {
         if (next.cores[instance.controller].stress >= 6) {
           next = applyEffects(
             next,
@@ -305,7 +305,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "leviathan-atramenti": {
+      case "aether-leviathan": {
         if (next.turnIncantationCount >= 2) {
           next = applyEffects(
             next,
@@ -318,7 +318,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "archivista-riftis": {
+      case "archivist": {
         if (next.turnSpellCount === 0) {
           next = applyEffects(
             next,
@@ -334,7 +334,7 @@ const runTimedTriggers = (
         }
         break;
       }
-      case "seraph-reticuli": {
+      case "trap-master": {
         const armedSealCount = next.inPlay.filter(
           (spellInPlay) =>
             spellInPlay.controller === instance.controller &&
@@ -469,7 +469,7 @@ const resolveTriggeredResponseAbilities = (state: GameState): GameState => {
       );
 
       for (const ability of triggeredAbilities) {
-        if (currentSeal.spellId === "auditor-fuliginis") {
+        if (currentSeal.spellId === "core-auditor") {
           const key = makeWorkUsageKey(
             currentSeal.instanceId,
             "auditor-response-scry",
@@ -480,7 +480,7 @@ const resolveTriggeredResponseAbilities = (state: GameState): GameState => {
           next = markWorkUsage(next, key);
         }
 
-        if (currentSeal.spellId === "turris-runarum") {
+        if (currentSeal.spellId === "hexing-turret") {
           const key = makeCycleUsageKey(
             currentSeal.instanceId,
             "turris-response-jam",
@@ -494,7 +494,7 @@ const resolveTriggeredResponseAbilities = (state: GameState): GameState => {
           next = markCycleUsage(next, key);
         }
 
-        if (currentSeal.spellId === "duelista-carbonis") {
+        if (currentSeal.spellId === "dueling-mage") {
           const key = makeCycleUsageKey(
             currentSeal.instanceId,
             "duelista-response-dispel",
@@ -682,7 +682,7 @@ const computeSpellCost = (
     if (source.slotIndex === 4) {
       const mechanista = getReadySpellsById(
         state,
-        "mechanista-novem",
+        "nine-slot-mechanist",
         player,
       )[0];
       if (mechanista) {
@@ -775,7 +775,7 @@ const announceFromWork = (
   };
 
   if (spell.type === "Incantation" && next.turnIncantationCount === 1) {
-    const scriba = getReadySpellsById(next, "scriba-aeris", player)[0];
+    const scriba = getReadySpellsById(next, "dutiful-squire", player)[0];
     if (scriba) {
       const power: [number, number] = [...next.power] as [number, number];
       power[player] += 1;
@@ -789,7 +789,7 @@ const announceFromWork = (
   }
 
   if (source.zone === "forge" && source.slotIndex <= 2) {
-    const venator = getReadySpellsById(next, "venator-fornacis", player)[0];
+    const venator = getReadySpellsById(next, "intern-smithy", player)[0];
     if (venator) {
       const key = makeWorkUsageKey(
         venator.instanceId,
@@ -909,7 +909,7 @@ const activateSpellAbilityFromWork = (
   }
 
   switch (spellInPlay.spellId) {
-    case "lemur-cineris": {
+    case "reckless-imp": {
       const key = makeWorkUsageKey(instanceId, "lemur-work-activate");
       if (hasWorkUsage(state, key)) {
         return state;
@@ -929,7 +929,7 @@ const activateSpellAbilityFromWork = (
       );
       return applyImmediateStressCheck(next);
     }
-    case "oraculum-specilli": {
+    case "town-scryer": {
       const key = makeWorkUsageKey(instanceId, "oraculum-work-activate");
       if (hasWorkUsage(state, key)) {
         return state;

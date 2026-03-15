@@ -38,7 +38,7 @@ export const CardFace = ({
   const presentation = getCardPresentation(spell.id, spell.type);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const imageFailed = failedSrc === presentation.artSrc;
-  const isForgeCard = size === "forge";
+  const isPreviewCard = size === "preview";
   const isInteractiveCard = Boolean(onAction);
   const tabIndex = onInspect || isInteractiveCard ? 0 : -1;
 
@@ -80,7 +80,6 @@ export const CardFace = ({
         <div className="card-face__title-row">
           <h3>{spell.name}</h3>
           <div className="card-face__cost-pip">
-            <span className="card-face__cost-label">Cost</span>
             <strong>{spell.costPower}</strong>
           </div>
         </div>
@@ -97,10 +96,30 @@ export const CardFace = ({
           />
         ) : null}
         <div className="card-face__art-overlay" />
+        {!isPreviewCard && (statusChips.length > 0 || metaLines.length > 0) ? (
+          <div className="card-face__table-overlay">
+            {statusChips.length > 0 ? (
+              <div className="card-face__chip-row">
+                {statusChips.map((chip) => (
+                  <span key={chip} className="card-face__chip">
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            {metaLines.length > 0 ? (
+              <div className="card-face__meta">
+                {metaLines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {imageFailed ? (
           <div className="card-face__art-fallback">
             <span className="card-face__sigil">{presentation.sigil}</span>
-            <span className="card-face__fallback-label">Art slot ready</span>
+            <span className="card-face__fallback-label">Art Goes Here</span>
           </div>
         ) : null}
         {actionLabel && isInteractiveCard ? (
@@ -108,7 +127,7 @@ export const CardFace = ({
         ) : null}
       </div>
 
-      {!isForgeCard ? (
+      {isPreviewCard ? (
         <div className="card-face__body">
           <p className="card-face__rules">{spell.rulesText}</p>
           {statusChips.length > 0 ? (
@@ -130,7 +149,7 @@ export const CardFace = ({
         </div>
       ) : null}
 
-      {!isForgeCard && footer ? (
+      {isPreviewCard && footer ? (
         <footer className="card-face__footer">{footer}</footer>
       ) : null}
     </article>

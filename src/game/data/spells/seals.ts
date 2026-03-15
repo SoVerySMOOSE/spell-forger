@@ -2,8 +2,8 @@ import type { SpellDefinition } from "../../model/spell";
 
 export const SEALS: SpellDefinition[] = [
   {
-    id: "filum-argenti-vivi",
-    name: "Quicksilver Tripwire",
+    id: "tripwire",
+    name: "Tripwire",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -11,7 +11,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an Artificer announces a spell costing 0. Effect: Dispel the announced spell.",
     abilities: [
       {
-        id: "filum-argenti-vivi-trigger",
+        id: "tripwire-trigger",
         timing: "Response",
         trigger: { kind: "whenSpellCostIs", amount: 0 },
         effects: [{ type: "Dispel", target: { kind: "announcedSpell" } }],
@@ -19,8 +19,8 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "valva-fuliginis",
-    name: "Soot-Stopper Valve",
+    id: "emergency-exhaust",
+    name: "Emergency Exhaust",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -28,7 +28,7 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "acus-siphonis",
+    id: "siphon-needle",
     name: "Siphon Needle",
     type: "Seal",
     costPower: 2,
@@ -37,8 +37,8 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "amuletum-hamuli-speculi",
-    name: "Mirrorhook Talisman",
+    id: "counter-siphon",
+    name: "Counter-Siphon",
     type: "Seal",
     costPower: 3,
     playWindow: "Work",
@@ -47,8 +47,8 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "os-cera-clausum",
-    name: "Wax-Sealed Mouth",
+    id: "mouth-sealing-wax",
+    name: "Mouth-Sealing Wax",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -56,7 +56,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an Artificer Speaks an Incantation. Effect: Dispel the announced spell.",
     abilities: [
       {
-        id: "os-cera-clausum-trigger",
+        id: "mouth-sealing-wax-trigger",
         timing: "Response",
         trigger: { kind: "whenAnySpeaks" },
         effects: [{ type: "Dispel", target: { kind: "announcedSpell" } }],
@@ -64,8 +64,8 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "sigillum-lubricum",
-    name: "Grease-Slick Sigil",
+    id: "summon-jammer",
+    name: "Summon Jammer",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -73,7 +73,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an opponent Conjures a Summon. Effect: Put 2 Jam Counters on that Summon.",
     abilities: [
       {
-        id: "sigillum-lubricum-trigger",
+        id: "summon-jammer-trigger",
         timing: "Response",
         trigger: { kind: "whenOpponentConjures" },
         effects: [
@@ -83,8 +83,8 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "laqueus-ferri-frigidi",
-    name: "Cold-Iron Snare",
+    id: "snare",
+    name: "Snare",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -92,7 +92,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an opponent announces a spell costing 4+. Effect: Put 3 Jam Counters on the announced spell.",
     abilities: [
       {
-        id: "laqueus-ferri-frigidi-trigger",
+        id: "snare-trigger",
         timing: "Response",
         trigger: { kind: "whenOpponentSpellCostAtLeast", amount: 4 },
         effects: [
@@ -102,7 +102,7 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "monile-ultionis",
+    id: "grudge-locket",
     name: "Grudge Locket",
     type: "Seal",
     costPower: 1,
@@ -112,8 +112,8 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "clepsydra-fissa",
-    name: "Cracked Hourglass",
+    id: "hourglass",
+    name: "Hourglass",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -121,7 +121,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an opponent announces any spell. Effect: Put 1 Jam Counter on the announced spell.",
     abilities: [
       {
-        id: "clepsydra-fissa-trigger",
+        id: "hourglass-trigger",
         timing: "Response",
         trigger: { kind: "whenOpponentAnnounces" },
         effects: [
@@ -131,8 +131,8 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "amuletum-furis",
-    name: "Thief-Catcher Charm",
+    id: "aether-alarm",
+    name: "Aether Alarm",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -141,8 +141,8 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "abacus-invidiae",
-    name: "Spiteful Abacus",
+    id: "mystical-spyglass",
+    name: "Mystical Spyglass",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -151,7 +151,7 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "forfex-sigilli",
+    id: "rune-scissors",
     name: "Rune-Scissors",
     type: "Seal",
     costPower: 2,
@@ -160,7 +160,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an opponent announces a Seal. Effect: Dispel the announced spell.",
     abilities: [
       {
-        id: "forfex-sigilli-trigger",
+        id: "rune-scissors-trigger",
         timing: "Response",
         trigger: { kind: "whenOpponentPrepares" },
         effects: [{ type: "Dispel", target: { kind: "announcedSpell" } }],
@@ -168,7 +168,7 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "corona-cava",
+    id: "hollow-crown",
     name: "Hollow Crown",
     type: "Seal",
     costPower: 2,
@@ -178,7 +178,7 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "plumbum-iudicis",
+    id: "lead-plumb-bob",
     name: "Lead-Plumb Bob",
     type: "Seal",
     costPower: 1,
@@ -187,7 +187,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an opponent announces a spell and they have 5+ Stress. Effect: Dispel the announced spell.",
     abilities: [
       {
-        id: "plumbum-iudicis-trigger",
+        id: "lead-plumb-bob-trigger",
         timing: "Response",
         trigger: { kind: "whenOpponentAnnouncesWithStressAtLeast", amount: 5 },
         effects: [{ type: "Dispel", target: { kind: "announcedSpell" } }],
@@ -195,7 +195,7 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "funis-salis",
+    id: "salted-fuse",
     name: "Salted Fuse",
     type: "Seal",
     costPower: 1,
@@ -205,8 +205,8 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "liber-rubiginis",
-    name: "Ledger of Rust",
+    id: "rusty-ledger",
+    name: "Rusty Ledger",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",
@@ -215,7 +215,7 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "clavus-in-rota",
+    id: "nail-in-the-gear",
     name: "Nail-in-the-Gear",
     type: "Seal",
     costPower: 1,
@@ -224,7 +224,7 @@ export const SEALS: SpellDefinition[] = [
       "Trigger: When an opponent announces a spell from the center Forge slot. Effect: Dispel the announced spell.",
     abilities: [
       {
-        id: "clavus-in-rota-trigger",
+        id: "nail-in-the-gear-trigger",
         timing: "Response",
         trigger: { kind: "whenOpponentAnnouncesFromForgeSlot", slotIndex: 4 },
         effects: [{ type: "Dispel", target: { kind: "announcedSpell" } }],
@@ -232,8 +232,8 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "pellis-anguillae",
-    name: "Eel-Skin Insulation",
+    id: "core-insulation",
+    name: "Core Insulation",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
@@ -242,15 +242,15 @@ export const SEALS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "patella-cineris",
-    name: "Ash-Catcher Pan",
+    id: "core-capacitor",
+    name: "Core Capacitor",
     type: "Seal",
     costPower: 1,
     playWindow: "Work",
     rulesText: "Trigger: When you Speak an Incantation. Effect: Vent 1.",
     abilities: [
       {
-        id: "patella-cineris-trigger",
+        id: "core-capacitor-trigger",
         timing: "Response",
         trigger: { kind: "whenYouSpeak" },
         effects: [{ type: "Vent", amount: 1, target: { kind: "selfCore" } }],
@@ -258,8 +258,8 @@ export const SEALS: SpellDefinition[] = [
     ],
   },
   {
-    id: "magnes-gibbosi",
-    name: "Gallows Magnet",
+    id: "eternal-reward",
+    name: "Eternal Reward",
     type: "Seal",
     costPower: 2,
     playWindow: "Work",

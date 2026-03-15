@@ -2,8 +2,8 @@ import type { SpellDefinition } from "../../model/spell";
 
 export const SUMMONS: SpellDefinition[] = [
   {
-    id: "lemur-cineris",
-    name: "Cinder-Kettle Imp",
+    id: "reckless-imp",
+    name: "Reckless Imp",
     type: "Summon",
     costPower: 1,
     playWindow: "Work",
@@ -11,8 +11,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "oraculum-specilli",
-    name: "Scryglass Oracle",
+    id: "town-scryer",
+    name: "Tower Scryer",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -20,8 +20,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "lucerna-scintillarum",
-    name: "Lantern of Unspent Sparks",
+    id: "aether-lantern",
+    name: "Aether Lantern",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -30,8 +30,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "turris-runarum",
-    name: "Runebolt Turret",
+    id: "hexing-turret",
+    name: "Hexing Turret",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -39,7 +39,7 @@ export const SUMMONS: SpellDefinition[] = [
       "During Response, once per Cycle: you may gain 1 Stress to put 1 Jam Counter on the announced spell.",
     abilities: [
       {
-        id: "turris-runarum-response",
+        id: "hexing-turret-response",
         timing: "Response",
         trigger: { kind: "whenAnySpellAnnounced" },
         effects: [
@@ -50,8 +50,8 @@ export const SUMMONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "draco-velluminis",
-    name: "Vellum-Scale Drake",
+    id: "fueling-drake",
+    name: "Fueling Drake",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -60,8 +60,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "scriba-aeris",
-    name: "Brassbone Scribe",
+    id: "dutiful-squire",
+    name: "Dutiful Squire",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -70,8 +70,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "aegis-sancti-ferri",
-    name: "Saint's Iron Aegis",
+    id: "protective-golem",
+    name: "Protectice Golem",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -80,8 +80,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "galea-speculi-atrati",
-    name: "Blackglass Mirrorhelm",
+    id: "animated-armor",
+    name: "Animated Armor",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -90,7 +90,7 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "mechanista-novem",
+    id: "nine-slot-mechanist",
     name: "Nine-Slot Mechanist",
     type: "Summon",
     costPower: 2,
@@ -100,8 +100,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "venator-fornacis",
-    name: "Forge-Row Prowler",
+    id: "intern-smithy",
+    name: "Intern Smithy",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -110,8 +110,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "chimaera-exhauriens",
-    name: "Spiral Exhaust Chimera",
+    id: "billowing-archon",
+    name: "Billowing Archon",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -120,8 +120,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "basiliscus-riveti",
-    name: "Rivetseam Basilisk",
+    id: "basilisk",
+    name: "Basilisk",
     type: "Summon",
     costPower: 4,
     playWindow: "Work",
@@ -130,8 +130,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "custos-campanae",
-    name: "Cathedral Bell-Sentinel",
+    id: "cathedral-sentinel",
+    name: "Cathedral Sentinel",
     type: "Summon",
     costPower: 5,
     playWindow: "Work",
@@ -139,8 +139,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "cor-crucibuli",
-    name: "Crucible Heart-Golem",
+    id: "crucible-stoker",
+    name: "Crucible Stoker",
     type: "Summon",
     costPower: 4,
     playWindow: "Work",
@@ -148,8 +148,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "leviathan-atramenti",
-    name: "Ink-Tide Leviathan",
+    id: "aether-leviathan",
+    name: "Aether Leviathan",
     type: "Summon",
     costPower: 6,
     playWindow: "Work",
@@ -157,7 +157,7 @@ export const SUMMONS: SpellDefinition[] = [
       "During your Maintenance: gain 2 Aether. If you Spoke 2+ Incantations this turn, gain +1 Aether. Then gain 1 Stress.",
     abilities: [
       {
-        id: "leviathan-atramenti-maintenance",
+        id: "aether-leviathan-maintenance",
         timing: "Maintenance",
         effects: [
           { type: "GainAether", amount: 2, target: { kind: "selfCore" } },
@@ -167,8 +167,8 @@ export const SUMMONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "custos-incudis",
-    name: "Oath-Anvil Warden",
+    id: "anvil-warden",
+    name: "Anvil Warden",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -177,8 +177,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "auditor-fuliginis",
-    name: "Soot-Clock Auditor",
+    id: "core-auditor",
+    name: "Core Auditor",
     type: "Summon",
     costPower: 2,
     playWindow: "Work",
@@ -186,7 +186,7 @@ export const SUMMONS: SpellDefinition[] = [
       "During Response, once per Work: when an opponent announces a spell costing 4+, you may Scry 1.",
     abilities: [
       {
-        id: "auditor-fuliginis-response",
+        id: "core-auditor-response",
         timing: "Response",
         trigger: { kind: "whenOpponentSpellCostAtLeast", amount: 4 },
         effects: [{ type: "Scry", amount: 1, target: "self" }],
@@ -194,8 +194,8 @@ export const SUMMONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "archivista-riftis",
-    name: "Rift Archivist",
+    id: "archivist",
+    name: "Archivist",
     type: "Summon",
     costPower: 4,
     playWindow: "Work",
@@ -204,8 +204,8 @@ export const SUMMONS: SpellDefinition[] = [
     abilities: [],
   },
   {
-    id: "seraph-reticuli",
-    name: "Chain-Lattice Seraph",
+    id: "trap-master",
+    name: "Trap Master",
     type: "Summon",
     costPower: 6,
     playWindow: "Work",
@@ -213,7 +213,7 @@ export const SUMMONS: SpellDefinition[] = [
       "During your Maintenance: gain 1 Aether for each Armed Seal you control (max 3). Then gain 1 Stress.",
     abilities: [
       {
-        id: "seraph-reticuli-maintenance",
+        id: "trap-master-maintenance",
         timing: "Maintenance",
         effects: [
           { type: "GainStress", amount: 1, target: { kind: "selfCore" } },
@@ -222,8 +222,8 @@ export const SUMMONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "duelista-carbonis",
-    name: "Coal-Crowned Duelist",
+    id: "dueling-mage",
+    name: "Dueling Mage",
     type: "Summon",
     costPower: 3,
     playWindow: "Work",
@@ -231,7 +231,7 @@ export const SUMMONS: SpellDefinition[] = [
       "During Response, once per Cycle: you may gain 2 Stress to Dispel the announced spell.",
     abilities: [
       {
-        id: "duelista-carbonis-response",
+        id: "dueling-mage-response",
         timing: "Response",
         trigger: { kind: "whenAnySpellAnnounced" },
         effects: [

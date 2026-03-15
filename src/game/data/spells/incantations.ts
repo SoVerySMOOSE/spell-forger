@@ -2,7 +2,7 @@ import type { SpellDefinition } from "../../model/spell";
 
 export const INCANTATIONS: SpellDefinition[] = [
   {
-    id: "canalis-rupturae",
+    id: "channel-the-faultline",
     name: "Channel the Faultline",
     type: "Incantation",
     costPower: 1,
@@ -10,7 +10,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     rulesText: "Gain 3 Stress. Gain 3 Power.",
     abilities: [
       {
-        id: "canalis-rupturae-resolution",
+        id: "channel-the-faultline-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "GainStress", amount: 3, target: { kind: "selfCore" } },
@@ -20,15 +20,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "schema-supercursus",
-    name: "Overclock Sketch",
+    id: "overclock",
+    name: "Overclock",
     type: "Incantation",
     costPower: 0,
     playWindow: "Work",
     rulesText: "Gain 2 Stress. Gain 2 Power.",
     abilities: [
       {
-        id: "schema-supercursus-resolution",
+        id: "overclock-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "GainStress", amount: 2, target: { kind: "selfCore" } },
@@ -38,7 +38,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "canticum-exhalationis",
+    id: "venting-canticle",
     name: "Venting Canticle",
     type: "Incantation",
     costPower: 1,
@@ -46,14 +46,14 @@ export const INCANTATIONS: SpellDefinition[] = [
     rulesText: "Vent 4.",
     abilities: [
       {
-        id: "canticum-exhalationis-resolution",
+        id: "venting-canticle-resolution",
         timing: "OnAnnounce",
         effects: [{ type: "Vent", amount: 4, target: { kind: "selfCore" } }],
       },
     ],
   },
   {
-    id: "corona-scintillarum",
+    id: "crown-of-sparks",
     name: "Crown of Sparks",
     type: "Incantation",
     costPower: 2,
@@ -61,7 +61,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     rulesText: "Gain 2 Aether. Scry 2.",
     abilities: [
       {
-        id: "corona-scintillarum-resolution",
+        id: "crown-of-sparks-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "GainAether", amount: 2, target: { kind: "selfCore" } },
@@ -71,15 +71,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "siphon-aetheris",
-    name: "Ether Siphon",
+    id: "aether-siphon",
+    name: "Aether Siphon",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
     rulesText: "Leech 2.",
     abilities: [
       {
-        id: "siphon-aetheris-resolution",
+        id: "aether-siphon-resolution",
         timing: "OnAnnounce",
         effects: [
           {
@@ -93,7 +93,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "inversio-fluxus",
+    id: "invert-the-flow",
     name: "Invert the Flow",
     type: "Incantation",
     costPower: 3,
@@ -101,7 +101,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     rulesText: "Move 3 Stress from your Core to an opponent's Core.",
     abilities: [
       {
-        id: "inversio-fluxus-resolution",
+        id: "invert-the-flow-resolution",
         timing: "OnAnnounce",
         effects: [
           {
@@ -115,16 +115,16 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "analysis-rupturae",
-    name: "Breakpoint Analysis",
+    id: "quick-analysis",
+    name: "Quick Analysis",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
     rulesText:
-      "Scry 4. You may immediately Dispel one revealed card (to Spent). If you do, gain 1 Power.",
+      "Scry 4. You may immediately Dispel one revealed card. If you do, gain 1 Power.",
     abilities: [
       {
-        id: "analysis-rupturae-resolution",
+        id: "quick-analysis-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "Scry", amount: 4, target: "self" },
@@ -138,15 +138,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "recordatio-cineris",
-    name: "Ashen Recall",
+    id: "scry",
+    name: "Scry",
     type: "Incantation",
     costPower: 0,
     playWindow: "Work",
     rulesText: "Scry 1. Then gain 1 Stress.",
     abilities: [
       {
-        id: "recordatio-cineris-resolution",
+        id: "scry-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "Scry", amount: 1, target: "self" },
@@ -156,15 +156,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "hasta-stellarum",
-    name: "Starfire Lance",
+    id: "tinkers-charm",
+    name: "Tinker's Charm",
     type: "Incantation",
     costPower: 3,
     playWindow: "Work",
     rulesText: "Gain 4 Aether. Then gain 2 Stress.",
     abilities: [
       {
-        id: "hasta-stellarum-resolution",
+        id: "tinkers-charm-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "GainAether", amount: 4, target: { kind: "selfCore" } },
@@ -174,7 +174,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "diluvium-aetheris",
+    id: "aether-flood",
     name: "Aether Flood",
     type: "Incantation",
     costPower: 4,
@@ -182,7 +182,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     rulesText: "Gain 6 Aether. Then gain 4 Stress.",
     abilities: [
       {
-        id: "diluvium-aetheris-resolution",
+        id: "aether-flood-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "GainAether", amount: 6, target: { kind: "selfCore" } },
@@ -192,15 +192,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "formula-cataclysmatis",
-    name: "Cataclysm Formula",
+    id: "cataclysmic-breakthrough",
+    name: "Cataclysmic Breakthrough",
     type: "Incantation",
     costPower: 5,
     playWindow: "Work",
     rulesText: "Set your Aether to 9. Then gain 7 Stress.",
     abilities: [
       {
-        id: "formula-cataclysmatis-resolution",
+        id: "cataclysmic-breakthrough-resolution",
         timing: "OnAnnounce",
         effects: [
           { type: "SetAether", amount: 9, target: { kind: "selfCore" } },
@@ -210,15 +210,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "incus-cadens",
-    name: "Hammerfall Hex",
+    id: "dispelling-hex",
+    name: "Dispelling Hex",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
     rulesText: "Dispel a Summon with cost 3 or less.",
     abilities: [
       {
-        id: "incus-cadens-resolution",
+        id: "dispelling-hex-resolution",
         timing: "OnAnnounce",
         effects: [
           {
@@ -230,30 +230,30 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "forfex-runarum",
-    name: "Sever the Tripwire",
+    id: "disarm",
+    name: "Disarm",
     type: "Incantation",
     costPower: 2,
     playWindow: "Work",
     rulesText: "Dispel an Armed Seal.",
     abilities: [
       {
-        id: "forfex-runarum-resolution",
+        id: "disarm-resolution",
         timing: "OnAnnounce",
         effects: [{ type: "Dispel", target: { kind: "chosenArmedSeal" } }],
       },
     ],
   },
   {
-    id: "aequatio-susurrans",
-    name: "Hushed Equation",
+    id: "jammer-bolt",
+    name: "Jammer Bolt",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
     rulesText: "Put 1 Jam Counter on up to two spells in play.",
     abilities: [
       {
-        id: "aequatio-susurrans-resolution",
+        id: "jammer-bolt-resolution",
         timing: "OnAnnounce",
         effects: [
           {
@@ -271,31 +271,31 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "rivus-retusus",
-    name: "Unmake the Rivet",
+    id: "unmake",
+    name: "Unmake",
     type: "Incantation",
     costPower: 1,
     playWindow: "Work",
     rulesText: "Dispel a Jammed spell.",
     abilities: [
       {
-        id: "rivus-retusus-resolution",
+        id: "unmake-resolution",
         timing: "OnAnnounce",
         effects: [{ type: "Dispel", target: { kind: "chosenJammedSpell" } }],
       },
     ],
   },
   {
-    id: "compas-witchlight",
-    name: "Witchlight Compass",
+    id: "focussed-efforts",
+    name: "Focussed Efforts",
     type: "Incantation",
-    costPower: 2,
+    costPower: 1,
     playWindow: "Work",
     rulesText:
       "Choose a Forge slot. The next spell you play from that slot this turn costs 2 less Power.",
     abilities: [
       {
-        id: "compas-witchlight-resolution",
+        id: "focussed-efforts-resolution",
         timing: "OnAnnounce",
         effects: [
           {
@@ -309,8 +309,8 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "minuta-mutuata",
-    name: "Borrowed Minute",
+    id: "delay",
+    name: "Delay",
     type: "Incantation",
     costPower: 1,
     playWindow: "Response",
@@ -318,7 +318,7 @@ export const INCANTATIONS: SpellDefinition[] = [
       "Response: Put 1 Jam Counter on the announced spell. Then Scry 1.",
     abilities: [
       {
-        id: "minuta-mutuata-response",
+        id: "delay-response",
         timing: "OnAnnounce",
         effects: [
           { type: "Jam", target: { kind: "announcedSpell" }, counters: 1 },
@@ -328,8 +328,8 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "syllaba-nulla",
-    name: "Null-Syllable",
+    id: "nullification",
+    name: "Nullification",
     type: "Incantation",
     costPower: 1,
     playWindow: "Response",
@@ -337,7 +337,7 @@ export const INCANTATIONS: SpellDefinition[] = [
       "Response: Dispel the announced spell unless its controller gains 2 Stress.",
     abilities: [
       {
-        id: "syllaba-nulla-response",
+        id: "nullification-response",
         timing: "OnAnnounce",
         effects: [
           {
@@ -349,15 +349,15 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "tempus-perfectum",
-    name: "Perfect Timing",
+    id: "sabotage",
+    name: "Sabotage",
     type: "Incantation",
     costPower: 2,
     playWindow: "Response",
     rulesText: "Response: Put 3 Jam Counters on the announced spell.",
     abilities: [
       {
-        id: "tempus-perfectum-response",
+        id: "sabotage-response",
         timing: "OnAnnounce",
         effects: [
           { type: "Jam", target: { kind: "announcedSpell" }, counters: 3 },
@@ -366,7 +366,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     ],
   },
   {
-    id: "rebuttal-staticus",
+    id: "static-rebuttal",
     name: "Static Rebuttal",
     type: "Incantation",
     costPower: 2,
@@ -374,7 +374,7 @@ export const INCANTATIONS: SpellDefinition[] = [
     rulesText: "Response: Put 2 Jam Counters on the announced spell.",
     abilities: [
       {
-        id: "rebuttal-staticus-response",
+        id: "static-rebuttal-response",
         timing: "OnAnnounce",
         effects: [
           { type: "Jam", target: { kind: "announcedSpell" }, counters: 2 },

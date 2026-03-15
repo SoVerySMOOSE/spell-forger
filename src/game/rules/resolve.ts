@@ -230,7 +230,7 @@ const applyStressGain = (
 
   for (const insulation of getReadySpellsById(
     next,
-    "pellis-anguillae",
+    "core-insulation",
     player,
   )) {
     if (remaining <= 0) {
@@ -247,7 +247,7 @@ const applyStressGain = (
 
   const afterStress = next.cores[player].stress;
   if (beforeStress < 9 && afterStress >= 9) {
-    const valve = getReadySpellsById(next, "valva-fuliginis", player)[0];
+    const valve = getReadySpellsById(next, "emergency-exhaust", player)[0];
     if (valve) {
       next = applyVentToCore(next, player, 3);
       next = dispelInstance(next, valve.instanceId, valve.controller);
@@ -272,17 +272,13 @@ const applyLeech = (
   let nextTo = to;
   let nextAmount = amount;
 
-  const mirrorhook = getReadySpellsById(
-    next,
-    "amuletum-hamuli-speculi",
-    from,
-  )[0];
+  const mirrorhook = getReadySpellsById(next, "counter-siphon", from)[0];
   if (mirrorhook && sourceController !== from) {
     nextTo = sourceController;
     next = dispelInstance(next, mirrorhook.instanceId, mirrorhook.controller);
   }
 
-  const galea = getReadySpellsById(next, "galea-speculi-atrati", from)[0];
+  const galea = getReadySpellsById(next, "animated-armor", from)[0];
   if (next.phase === "response" && galea && sourceController !== from) {
     const key = makeCycleUsageKey(galea.instanceId, "galea-leech-redirect");
     if (!hasCycleUsage(next, key)) {
@@ -296,7 +292,7 @@ const applyLeech = (
     }
   }
 
-  const aegis = getReadySpellsById(next, "aegis-sancti-ferri", from)[0];
+  const aegis = getReadySpellsById(next, "protective-golem", from)[0];
   if (aegis && sourceController !== from) {
     const key = makeCycleUsageKey(aegis.instanceId, "aegis-reduce-leech");
     if (!hasCycleUsage(next, key)) {
@@ -331,7 +327,7 @@ const applyAetherGain = (
   let next = state;
   let nextAmount = amount;
 
-  const hollowCrowns = getReadySpellsById(next, "corona-cava").filter(
+  const hollowCrowns = getReadySpellsById(next, "hollow-crown").filter(
     (seal) => seal.controller !== player,
   );
   if (nextAmount >= 6 && hollowCrowns.length > 0) {
@@ -348,7 +344,7 @@ const applyAetherGain = (
   }));
 
   if (beforeAether < 10 && beforeAether + nextAmount >= 10) {
-    for (const magnet of getReadySpellsById(next, "magnes-gibbosi").filter(
+    for (const magnet of getReadySpellsById(next, "eternal-reward").filter(
       (seal) => seal.controller !== player,
     )) {
       next = applyStressGain(next, player, 3);
@@ -357,7 +353,7 @@ const applyAetherGain = (
   }
 
   if (beforeAether >= 8) {
-    for (const charm of getReadySpellsById(next, "amuletum-furis").filter(
+    for (const charm of getReadySpellsById(next, "aether-alarm").filter(
       (seal) => seal.controller !== player,
     )) {
       next = applyStressGain(next, player, 2);
@@ -366,7 +362,7 @@ const applyAetherGain = (
   }
 
   if (nextAmount >= 4) {
-    for (const fuse of getReadySpellsById(next, "funis-salis").filter(
+    for (const fuse of getReadySpellsById(next, "salted-fuse").filter(
       (seal) => seal.controller !== player,
     )) {
       next = applyStressGain(next, player, 3);
@@ -374,7 +370,7 @@ const applyAetherGain = (
     }
   }
 
-  for (const needle of getReadySpellsById(next, "acus-siphonis").filter(
+  for (const needle of getReadySpellsById(next, "siphon-needle").filter(
     (seal) => seal.controller !== player,
   )) {
     next = applyLeech(next, player, needle.controller, 1, needle.controller);
@@ -395,7 +391,7 @@ const applyPowerGain = (
   let next = state;
   let nextAmount = amount;
 
-  for (const ledger of getReadySpellsById(next, "liber-rubiginis").filter(
+  for (const ledger of getReadySpellsById(next, "rusty-ledger").filter(
     (seal) => seal.controller !== player,
   )) {
     nextAmount = 0;
@@ -425,7 +421,7 @@ const handleSpellDispelledTriggers = (
   let next = state;
 
   if (next.phase === "response") {
-    for (const lantern of getReadySpellsById(next, "lucerna-scintillarum")) {
+    for (const lantern of getReadySpellsById(next, "aether-lantern")) {
       const key = makeCycleUsageKey(
         lantern.instanceId,
         "lucerna-response-dispel",
@@ -437,7 +433,7 @@ const handleSpellDispelledTriggers = (
       next = applyAetherGain(next, lantern.controller, 1);
     }
 
-    for (const abacus of getReadySpellsById(next, "abacus-invidiae")) {
+    for (const abacus of getReadySpellsById(next, "mystical-spyglass")) {
       next = applyEffects(next, [{ type: "Scry", amount: 2, target: "self" }], {
         sourceController: abacus.controller,
         sourceInstanceId: abacus.instanceId,
@@ -449,7 +445,7 @@ const handleSpellDispelledTriggers = (
   if (sourcePlayer !== null && sourcePlayer !== dispelledSpell.controller) {
     for (const locket of getReadySpellsById(
       next,
-      "monile-ultionis",
+      "grudge-locket",
       dispelledSpell.controller,
     )) {
       next = applyAetherGain(next, locket.controller, 2);
@@ -472,10 +468,10 @@ export const dispelInstance = (
 
   let next = state;
   if (player !== null && spell.controller !== player) {
-    for (const warden of getReadySpellsById(next, "custos-incudis", player)) {
+    for (const warden of getReadySpellsById(next, "anvil-warden", player)) {
       const key = makeCycleUsageKey(
         warden.instanceId,
-        "custos-incudis-replace-dispel",
+        "anvil-warden-replace-dispel",
       );
       if (hasCycleUsage(next, key)) {
         continue;
